@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\navigationnode.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
+        "Includes": [
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\pathfinding\\navigationnode.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\navigationnode.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

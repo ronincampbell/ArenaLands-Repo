@@ -1,0 +1,31 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\enemycharacter.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
+        "Includes": [
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\characters\\enemycharacter.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\gameframework\\character.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\gameframework\\charactermovementreplication.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\experimental\\iris\\core\\public\\iris\\serialization\\irisobjectreferencepackagemap.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\iriscore\\uht\\irisobjectreferencepackagemap.generated.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\charactermovementreplication.generated.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\gameframework\\rootmotionsource.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\rootmotionsource.generated.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\character.generated.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\characters\\basecharacter.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\characters\\weaponcomponent.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\weaponcomponent.generated.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\basecharacter.generated.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\characters\\playercharacter.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\inputactionvalue.h",
+            "c:\\program files\\epic games\\ue_5.2\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\inputactionvalue.generated.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\playercharacter.generated.h",
+            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\enemycharacter.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
