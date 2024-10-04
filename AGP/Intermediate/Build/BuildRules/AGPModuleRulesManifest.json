@@ -1,8 +1,8 @@
 {
 	"SourceFiles": [
-		"C:\\Users\\Fuzzy\\Documents\\GitHub\\ArenaLands\\ArenaLands-Repo\\AGP\\Source\\AGP\\AGP.Build.cs",
-		"C:\\Users\\Fuzzy\\Documents\\GitHub\\ArenaLands\\ArenaLands-Repo\\AGP\\Source\\AGP.Target.cs",
-		"C:\\Users\\Fuzzy\\Documents\\GitHub\\ArenaLands\\ArenaLands-Repo\\AGP\\Source\\AGPEditor.Target.cs"
+		"C:\\Users\\Fuzzy\\Documents\\Unreal Projects\\ArenaLands-Repo\\AGP\\Source\\AGP\\AGP.Build.cs",
+		"C:\\Users\\Fuzzy\\Documents\\Unreal Projects\\ArenaLands-Repo\\AGP\\Source\\AGP.Target.cs",
+		"C:\\Users\\Fuzzy\\Documents\\Unreal Projects\\ArenaLands-Repo\\AGP\\Source\\AGPEditor.Target.cs"
 	],
 	"EngineVersion": "5.2.1"
 }

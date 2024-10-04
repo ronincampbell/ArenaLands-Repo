@@ -30,6 +30,18 @@ public:
 	 */
 	void Reload();
 
+	// Public bools for each modification so we can use them for models in the blueprint
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bHasFireRateMod = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bHasBaseDamageMod = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bHasMagazineSizeMod = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bHasReloadTimeMod = false;
+	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,6 +74,9 @@ protected:
 	 * @return true if a shot was taken and false otherwise.
 	 */
 	bool Fire(const FVector& FireAtLocation);
+
+	// Updates modification bools based on weapon stats
+	void UpdateModBools(const FWeaponStats& WeaponStats);
 
 public:	
 	// Called every frame

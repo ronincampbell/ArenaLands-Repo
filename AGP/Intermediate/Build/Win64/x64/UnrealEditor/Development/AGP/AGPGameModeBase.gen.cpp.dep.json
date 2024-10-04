@@ -1,17 +1,17 @@
 {
     "Version": "1.2",
     "Data": {
-        "Source": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\agpgamemodebase.gen.cpp",
+        "Source": "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\agpgamemodebase.gen.cpp",
         "ProvidedModule": "",
-        "PCH": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
+        "PCH": "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
         "Includes": [
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\agpgamemodebase.h",
-            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamemodebase.h",
-            "c:\\program files\\epic games\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\engine\\serverstatreplicator.h",
-            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\serverstatreplicator.generated.h",
-            "c:\\program files\\epic games\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamemodebase.generated.h",
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\agpgamemodebase.generated.h"
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\source\\agp\\agpgamemodebase.h",
+            "e:\\epicgames\\ue\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamemodebase.h",
+            "e:\\epicgames\\ue\\ue_5.2\\engine\\source\\runtime\\engine\\classes\\engine\\serverstatreplicator.h",
+            "e:\\epicgames\\ue\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\serverstatreplicator.generated.h",
+            "e:\\epicgames\\ue\\ue_5.2\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamemodebase.generated.h",
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\agpgamemodebase.generated.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

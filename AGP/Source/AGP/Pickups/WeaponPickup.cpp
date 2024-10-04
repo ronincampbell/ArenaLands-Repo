@@ -1,8 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "WeaponPickup.h"
-
 #include "../Characters/PlayerCharacter.h"
 
 void AWeaponPickup::BeginPlay()
@@ -16,9 +12,6 @@ void AWeaponPickup::BeginPlay()
 void AWeaponPickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                     UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitInfo)
 {
-	//Super::OnPickupOverlap(OverlappedComponent, OtherActor, OtherComponent, OtherBodyIndex, bFromSweep, HitInfo);
-	// UE_LOG(LogTemp, Display, TEXT("Overlap event occurred on WeaponPickup"))
-
 	if (ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor))
 	{
 		Player->EquipWeapon(true, WeaponStats);
@@ -29,37 +22,70 @@ void AWeaponPickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AA
 void AWeaponPickup::GenerateWeaponPickup()
 {
 	WeaponRarity = WeaponRarityPicker();
-	TArray<bool> GoodStats;
+
+	int32 NumModifications = 1; // Common has 1 slot
 	switch (WeaponRarity)
 	{
 	case EWeaponRarity::Legendary:
-		GoodStats = WeaponStatPicker(4, 5);
+		NumModifications = 4;
 		break;
 	case EWeaponRarity::Master:
-		GoodStats = WeaponStatPicker(3, 5);
+		NumModifications = 3;
 		break;
 	case EWeaponRarity::Rare:
-		GoodStats = WeaponStatPicker(2, 5);
+		NumModifications = 2;
 		break;
 	default:
-		GoodStats = WeaponStatPicker(0, 5);
+		NumModifications = 1;
 		break;
 	}
 
-	WeaponStats.Accuracy = GoodStats[0] ? FMath::RandRange(0.98f, 1.0f) : FMath::RandRange(0.9f, 0.98f);
-	WeaponStats.FireRate = GoodStats[1] ? FMath::RandRange(0.05f, 0.2f) : FMath::RandRange(0.2f, 1.0f);
-	WeaponStats.BaseDamage = GoodStats[2] ? FMath::RandRange(15.0f, 30.0f) : FMath::RandRange(5.0f, 15.0f);
-	WeaponStats.MagazineSize = GoodStats[3] ? FMath::RandRange(20, 100) : FMath::RandRange(1, 19);
-	WeaponStats.ReloadTime = GoodStats[4] ? FMath::RandRange(0.1f, 1.0f) : FMath::RandRange(1.0f, 4.0f);
+	TArray<EWeaponModification> Modifications = GenerateWeaponModifications(NumModifications);
+	ApplyWeaponModifications(Modifications);
+}
+
+TArray<EWeaponModification> AWeaponPickup::GenerateWeaponModifications(int32 NumModifications)
+{
+	TArray<EWeaponModification> Modifications;
+	TArray<EWeaponModification> PossibleMods = {EWeaponModification::FireRate, EWeaponModification::BaseDamage, EWeaponModification::MagazineSize, EWeaponModification::ReloadTime};
+
+	for (int32 i = 0; i < NumModifications; i++)
+	{
+		const int32 RandIndex = FMath::RandRange(0, PossibleMods.Num() - 1);
+		Modifications.Add(PossibleMods[RandIndex]);
+	}
+
+	return Modifications;
+}
+
+void AWeaponPickup::ApplyWeaponModifications(const TArray<EWeaponModification>& Modifications)
+{
+	for (EWeaponModification Mod : Modifications)
+	{
+		switch (Mod)
+		{
+		case EWeaponModification::FireRate:
+			WeaponStats.FireRate *= 0.8f; // Decrease fire rate delay by 20%
+			//UE_LOG(LogTemp, Display, TEXT("Fire Rate Mod Equipped"));
+			break;
+		case EWeaponModification::BaseDamage:
+			WeaponStats.BaseDamage *= 1.2f; // Increase base damage by 20%
+			//UE_LOG(LogTemp, Display, TEXT("Base Damage Mod Equipped"));
+			break;
+		case EWeaponModification::MagazineSize:
+			WeaponStats.MagazineSize *= 2; // Double magazine size
+			//UE_LOG(LogTemp, Display, TEXT("Magazine Size Mod Equipped"));
+			break;
+		case EWeaponModification::ReloadTime:
+			WeaponStats.ReloadTime *= 0.7f; // Decrease reload time by 30%
+			//UE_LOG(LogTemp, Display, TEXT("Reload Time Mod Equipped"));
+			break;
+		}
+	}
 }
 
 EWeaponRarity AWeaponPickup::WeaponRarityPicker()
 {
-	// Rules:
-	// 50% chance of Common
-	// 30% chance of Rare
-	// 15% chance of Master
-	// 5% chance of Legendary
 	const float RandPercent = FMath::RandRange(0.0f, 1.0f);
 	
 	if (RandPercent <= 0.5f)
@@ -76,28 +102,4 @@ EWeaponRarity AWeaponPickup::WeaponRarityPicker()
 	}
 	
 	return EWeaponRarity::Legendary;
-}
-
-TArray<bool> AWeaponPickup::WeaponStatPicker(int32 NumOfGood, int32 NumOfStats)
-{
-	// Fill the array with the correct number of good and bad stats.
-	TArray<bool> GoodStats;
-	for (int32 i = 0; i < NumOfStats; i++)
-	{
-		// Ternary condition: Will add true if I < NumOfGood otherwise add false.
-		GoodStats.Add(i < NumOfGood ? true : false);
-	}
-
-	// Array shuffling algorithm.
-	for (int32 i = 0; i < GoodStats.Num(); i++)
-	{
-		// Get a random index from the GoodStats array.
-		const int32 RandIndex = FMath::RandRange(0, GoodStats.Num() - 1);
-		// Then swap the item at that random index with the item in the i index.
-		const bool Temp = GoodStats[i];
-		GoodStats[i] = GoodStats[RandIndex];
-		GoodStats[RandIndex] = Temp;
-	}
-
-	return GoodStats;
 }

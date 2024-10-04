@@ -12,6 +12,7 @@ void EmptyLinkFunctionForGeneratedCodeWeaponPickup() {}
 	AGP_API UClass* Z_Construct_UClass_APickupBase();
 	AGP_API UClass* Z_Construct_UClass_AWeaponPickup();
 	AGP_API UClass* Z_Construct_UClass_AWeaponPickup_NoRegister();
+	AGP_API UEnum* Z_Construct_UEnum_AGP_EWeaponModification();
 	AGP_API UEnum* Z_Construct_UEnum_AGP_EWeaponRarity();
 	UPackage* Z_Construct_UPackage__Script_AGP();
 // End Cross Module References
@@ -71,6 +72,63 @@ void EmptyLinkFunctionForGeneratedCodeWeaponPickup() {}
 			UECodeGen_Private::ConstructUEnum(Z_Registration_Info_UEnum_EWeaponRarity.InnerSingleton, Z_Construct_UEnum_AGP_EWeaponRarity_Statics::EnumParams);
 		}
 		return Z_Registration_Info_UEnum_EWeaponRarity.InnerSingleton;
+	}
+	static FEnumRegistrationInfo Z_Registration_Info_UEnum_EWeaponModification;
+	static UEnum* EWeaponModification_StaticEnum()
+	{
+		if (!Z_Registration_Info_UEnum_EWeaponModification.OuterSingleton)
+		{
+			Z_Registration_Info_UEnum_EWeaponModification.OuterSingleton = GetStaticEnum(Z_Construct_UEnum_AGP_EWeaponModification, (UObject*)Z_Construct_UPackage__Script_AGP(), TEXT("EWeaponModification"));
+		}
+		return Z_Registration_Info_UEnum_EWeaponModification.OuterSingleton;
+	}
+	template<> AGP_API UEnum* StaticEnum<EWeaponModification>()
+	{
+		return EWeaponModification_StaticEnum();
+	}
+	struct Z_Construct_UEnum_AGP_EWeaponModification_Statics
+	{
+		static const UECodeGen_Private::FEnumeratorParam Enumerators[];
+#if WITH_METADATA
+		static const UECodeGen_Private::FMetaDataPairParam Enum_MetaDataParams[];
+#endif
+		static const UECodeGen_Private::FEnumParams EnumParams;
+	};
+	const UECodeGen_Private::FEnumeratorParam Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enumerators[] = {
+		{ "EWeaponModification::FireRate", (int64)EWeaponModification::FireRate },
+		{ "EWeaponModification::BaseDamage", (int64)EWeaponModification::BaseDamage },
+		{ "EWeaponModification::MagazineSize", (int64)EWeaponModification::MagazineSize },
+		{ "EWeaponModification::ReloadTime", (int64)EWeaponModification::ReloadTime },
+	};
+#if WITH_METADATA
+	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enum_MetaDataParams[] = {
+		{ "BaseDamage.Name", "EWeaponModification::BaseDamage" },
+		{ "BlueprintType", "true" },
+		{ "FireRate.Name", "EWeaponModification::FireRate" },
+		{ "MagazineSize.Name", "EWeaponModification::MagazineSize" },
+		{ "ModuleRelativePath", "Pickups/WeaponPickup.h" },
+		{ "ReloadTime.Name", "EWeaponModification::ReloadTime" },
+	};
+#endif
+	const UECodeGen_Private::FEnumParams Z_Construct_UEnum_AGP_EWeaponModification_Statics::EnumParams = {
+		(UObject*(*)())Z_Construct_UPackage__Script_AGP,
+		nullptr,
+		"EWeaponModification",
+		"EWeaponModification",
+		Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enumerators,
+		UE_ARRAY_COUNT(Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enumerators),
+		RF_Public|RF_Transient|RF_MarkAsNative,
+		EEnumFlags::None,
+		(uint8)UEnum::ECppForm::EnumClass,
+		METADATA_PARAMS(Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enum_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UEnum_AGP_EWeaponModification_Statics::Enum_MetaDataParams))
+	};
+	UEnum* Z_Construct_UEnum_AGP_EWeaponModification()
+	{
+		if (!Z_Registration_Info_UEnum_EWeaponModification.InnerSingleton)
+		{
+			UECodeGen_Private::ConstructUEnum(Z_Registration_Info_UEnum_EWeaponModification.InnerSingleton, Z_Construct_UEnum_AGP_EWeaponModification_Statics::EnumParams);
+		}
+		return Z_Registration_Info_UEnum_EWeaponModification.InnerSingleton;
 	}
 	static FName NAME_AWeaponPickup_UpdateWeaponPickupMaterial = FName(TEXT("UpdateWeaponPickupMaterial"));
 	void AWeaponPickup::UpdateWeaponPickupMaterial()
@@ -132,7 +190,6 @@ void EmptyLinkFunctionForGeneratedCodeWeaponPickup() {}
 	};
 #if WITH_METADATA
 	const UECodeGen_Private::FMetaDataPairParam Z_Construct_UClass_AWeaponPickup_Statics::Class_MetaDataParams[] = {
-		{ "Comment", "/**\n * \n */" },
 		{ "IncludePath", "Pickups/WeaponPickup.h" },
 		{ "ModuleRelativePath", "Pickups/WeaponPickup.h" },
 	};
@@ -182,19 +239,20 @@ void EmptyLinkFunctionForGeneratedCodeWeaponPickup() {}
 	AWeaponPickup::AWeaponPickup() {}
 	DEFINE_VTABLE_PTR_HELPER_CTOR(AWeaponPickup);
 	AWeaponPickup::~AWeaponPickup() {}
-	struct Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics
+	struct Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics
 	{
 		static const FEnumRegisterCompiledInInfo EnumInfo[];
 		static const FClassRegisterCompiledInInfo ClassInfo[];
 	};
-	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo[] = {
+	const FEnumRegisterCompiledInInfo Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo[] = {
 		{ EWeaponRarity_StaticEnum, TEXT("EWeaponRarity"), &Z_Registration_Info_UEnum_EWeaponRarity, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 2441037178U) },
+		{ EWeaponModification_StaticEnum, TEXT("EWeaponModification"), &Z_Registration_Info_UEnum_EWeaponModification, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 2592407637U) },
 	};
-	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo[] = {
-		{ Z_Construct_UClass_AWeaponPickup, AWeaponPickup::StaticClass, TEXT("AWeaponPickup"), &Z_Registration_Info_UClass_AWeaponPickup, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AWeaponPickup), 369035739U) },
+	const FClassRegisterCompiledInInfo Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo[] = {
+		{ Z_Construct_UClass_AWeaponPickup, AWeaponPickup::StaticClass, TEXT("AWeaponPickup"), &Z_Registration_Info_UClass_AWeaponPickup, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AWeaponPickup), 3325891580U) },
 	};
-	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_2693119641(TEXT("/Script/AGP"),
-		Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo),
+	static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_413613856(TEXT("/Script/AGP"),
+		Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::ClassInfo),
 		nullptr, 0,
-		Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo));
+		Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_AGP_Source_AGP_Pickups_WeaponPickup_h_Statics::EnumInfo));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

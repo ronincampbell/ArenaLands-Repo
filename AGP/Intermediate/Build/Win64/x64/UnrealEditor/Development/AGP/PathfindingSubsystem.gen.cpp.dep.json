@@ -1,13 +1,13 @@
 {
     "Version": "1.2",
     "Data": {
-        "Source": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\pathfindingsubsystem.gen.cpp",
+        "Source": "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\pathfindingsubsystem.gen.cpp",
         "ProvidedModule": "",
-        "PCH": "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
+        "PCH": "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\agpeditor\\development\\engine\\sharedpch.engine.shadowerrors.inclorderunreal5_1.h.pch",
         "Includes": [
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\source\\agp\\pathfinding\\pathfindingsubsystem.h",
-            "c:\\users\\fuzzy\\documents\\github\\arenalands\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\pathfindingsubsystem.generated.h"
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\agp\\definitions.agp.h",
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\source\\agp\\pathfinding\\pathfindingsubsystem.h",
+            "c:\\users\\fuzzy\\documents\\unreal projects\\arenalands-repo\\agp\\intermediate\\build\\win64\\unrealeditor\\inc\\agp\\uht\\pathfindingsubsystem.generated.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

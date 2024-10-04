@@ -31,6 +31,36 @@ bool ABaseCharacter::Fire(const FVector& FireAtLocation)
 	return false;
 }
 
+void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
+{
+	// Reset all the bools to false
+	bHasFireRateMod = false;
+	bHasBaseDamageMod = false;
+	bHasMagazineSizeMod = false;
+	bHasReloadTimeMod = false;
+
+	// Check for active modifications and set the corresponding bools to true
+	if (WeaponStats.FireRate < 0.2f)
+	{
+		bHasFireRateMod = true;
+	}
+
+	if (WeaponStats.BaseDamage > 10.0f)
+	{
+		bHasBaseDamageMod = true;
+	}
+
+	if (WeaponStats.MagazineSize > 5)
+	{
+		bHasMagazineSizeMod = true;
+	}
+
+	if (WeaponStats.ReloadTime < 1.0f)
+	{
+		bHasReloadTimeMod = true;
+	}
+}
+
 void ABaseCharacter::Reload()
 {
 	if (HasWeapon())
@@ -71,6 +101,7 @@ void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponSt
 		// Set the weapons stats to the given weapon stats.
 		UE_LOG(LogTemp, Display, TEXT("Equipping weapon: \n%s"), *WeaponStats.ToString())
 		WeaponComponent->SetWeaponStats(WeaponStats);
+		UpdateModBools(WeaponStats);
 	}
 	
 	EquipWeaponGraphical(bEquipWeapon);

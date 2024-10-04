@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -32,7 +30,6 @@ public:
 	FString ToString() const
 	{
 		FString WeaponString = "";
-		WeaponString += "Accuracy:      " + FString::SanitizeFloat(Accuracy) + "\n";
 		WeaponString += "Fire Rate:     " + FString::SanitizeFloat(FireRate) + "\n";
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
@@ -78,5 +75,4 @@ private:
 	 */
 	void CompleteReload();
 	float CurrentReloadDuration = 0.0f;
-		
 };

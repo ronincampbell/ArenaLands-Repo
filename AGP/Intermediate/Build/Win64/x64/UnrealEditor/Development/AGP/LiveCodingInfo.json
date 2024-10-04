@@ -5,11 +5,9 @@
 			"AGP.cpp.obj",
 			"AGPGameInstance.cpp.obj",
 			"AGPGameModeBase.cpp.obj",
-			"BaseCharacter.cpp.obj",
 			"EnemyCharacter.cpp.obj",
 			"HealthComponent.cpp.obj",
 			"PlayerCharacter.cpp.obj",
-			"WeaponComponent.cpp.obj",
 			"ProceduralLandscape.cpp.obj",
 			"NavigationNode.cpp.obj",
 			"PathfindingSubsystem.cpp.obj",
@@ -17,7 +15,6 @@
 			"PickupRotatorComponent.cpp.obj",
 			"PickupBase.cpp.obj",
 			"PickupManagerSubsystem.cpp.obj",
-			"WeaponPickup.cpp.obj",
 			"AGP.init.gen.cpp.obj",
 			"AGPGameInstance.gen.cpp.obj",
 			"AGPGameModeBase.gen.cpp.obj",
@@ -33,7 +30,10 @@
 			"PlayerCharacter.gen.cpp.obj",
 			"ProceduralLandscape.gen.cpp.obj",
 			"WeaponComponent.gen.cpp.obj",
-			"WeaponPickup.gen.cpp.obj"
+			"WeaponPickup.gen.cpp.obj",
+			"BaseCharacter.cpp.obj",
+			"WeaponComponent.cpp.obj",
+			"WeaponPickup.cpp.obj"
 		]
 	}
 }

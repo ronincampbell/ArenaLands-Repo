@@ -17,19 +17,19 @@ struct FHitResult;
 #endif
 #define AGP_PickupBase_generated_h
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS \
  \
 	DECLARE_FUNCTION(execOnPickupOverlap);
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
  \
 	DECLARE_FUNCTION(execOnPickupOverlap);
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAPickupBase(); \
 	friend struct Z_Construct_UClass_APickupBase_Statics; \
@@ -38,7 +38,7 @@ public: \
 	DECLARE_SERIALIZER(APickupBase)
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS \
 private: \
 	static void StaticRegisterNativesAPickupBase(); \
 	friend struct Z_Construct_UClass_APickupBase_Statics; \
@@ -47,7 +47,7 @@ public: \
 	DECLARE_SERIALIZER(APickupBase)
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_STANDARD_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API APickupBase(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(APickupBase) \
@@ -61,7 +61,7 @@ public: \
 	NO_API virtual ~APickupBase();
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_ENHANCED_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API APickupBase(APickupBase&&); \
@@ -73,27 +73,27 @@ public: \
 	NO_API virtual ~APickupBase();
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_11_PROLOG
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_GENERATED_BODY_LEGACY \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_11_PROLOG
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_STANDARD_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_GENERATED_BODY \
+#define FID_AGP_Source_AGP_Pickups_PickupBase_h_14_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS_NO_PURE_DECLS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h_14_ENHANCED_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_SPARSE_DATA \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_ACCESSORS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_INCLASS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Pickups_PickupBase_h_14_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -101,7 +101,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> AGP_API UClass* StaticClass<class APickupBase>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Pickups_PickupBase_h
+#define CURRENT_FILE_ID FID_AGP_Source_AGP_Pickups_PickupBase_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

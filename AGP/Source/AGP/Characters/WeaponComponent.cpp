@@ -1,19 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "WeaponComponent.h"
-
 #include "BaseCharacter.h"
 #include "HealthComponent.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLocation)
@@ -107,8 +99,6 @@ void UWeaponComponent::BeginPlay()
 	// ...
 }
 
-
-
 // Called every frame
 void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -127,4 +117,3 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 }
-

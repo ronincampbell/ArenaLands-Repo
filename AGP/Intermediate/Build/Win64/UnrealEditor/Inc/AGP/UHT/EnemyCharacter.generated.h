@@ -15,19 +15,19 @@ class APawn;
 #endif
 #define AGP_EnemyCharacter_generated_h
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS \
  \
 	DECLARE_FUNCTION(execOnSensedPawn);
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS_NO_PURE_DECLS \
  \
 	DECLARE_FUNCTION(execOnSensedPawn);
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAEnemyCharacter(); \
 	friend struct Z_Construct_UClass_AEnemyCharacter_Statics; \
@@ -36,7 +36,7 @@ public: \
 	DECLARE_SERIALIZER(AEnemyCharacter)
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS \
 private: \
 	static void StaticRegisterNativesAEnemyCharacter(); \
 	friend struct Z_Construct_UClass_AEnemyCharacter_Statics; \
@@ -45,7 +45,7 @@ public: \
 	DECLARE_SERIALIZER(AEnemyCharacter)
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_STANDARD_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API AEnemyCharacter(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AEnemyCharacter) \
@@ -59,7 +59,7 @@ public: \
 	NO_API virtual ~AEnemyCharacter();
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ENHANCED_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API AEnemyCharacter(AEnemyCharacter&&); \
@@ -71,27 +71,27 @@ public: \
 	NO_API virtual ~AEnemyCharacter();
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_31_PROLOG
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_GENERATED_BODY_LEGACY \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_31_PROLOG
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_STANDARD_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_GENERATED_BODY \
+#define FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS_NO_PURE_DECLS \
-	FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ENHANCED_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_SPARSE_DATA \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ACCESSORS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_INCLASS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Characters_EnemyCharacter_h_34_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -99,7 +99,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> AGP_API UClass* StaticClass<class AEnemyCharacter>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_Users_Fuzzy_Documents_GitHub_ArenaLands_ArenaLands_Repo_AGP_Source_AGP_Characters_EnemyCharacter_h
+#define CURRENT_FILE_ID FID_AGP_Source_AGP_Characters_EnemyCharacter_h
 
 
 #define FOREACH_ENUM_EENEMYSTATE(op) \
