@@ -45,6 +45,10 @@ public:
 	 */
 	TArray<FVector> GetPathAway(const FVector& StartLocation, const FVector& TargetLocation);
 
+	FVector GetPosInDirection(const FVector& StartLocation, const FVector& TargetDirection);
+
+	FVector FindNearestNodePos(const FVector& TargetLocation);
+
 	// Procedural Map Logic
 	/**
 	 * Will place down navigation nodes at the vertex positions, excluding the edge vertex positions and
@@ -70,6 +74,7 @@ private:
 	ANavigationNode* GetRandomNode();
 	ANavigationNode* FindNearestNode(const FVector& TargetLocation);
 	ANavigationNode* FindFurthestNode(const FVector& TargetLocation);
+	ANavigationNode* GetNeighbourNodeInDirection(ANavigationNode* StartNode, const FVector& TargetDirection);
 	TArray<FVector> GetPath(ANavigationNode* StartNode, ANavigationNode* EndNode);
 	static TArray<FVector> ReconstructPath(const TMap<ANavigationNode*, ANavigationNode*>& CameFromMap, ANavigationNode* EndNode);
 	

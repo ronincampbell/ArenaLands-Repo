@@ -20,9 +20,14 @@ class UPathfindingSubsystem;
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
+	Guard,
 	Patrol,
-	Engage,
-	Evade
+	Wander,
+	Hold,
+	Push,
+	Retreat,
+	Investigate,
+	Scatter
 };
 
 /**
@@ -41,23 +46,27 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//UPROPERTY(VisibleAnywhere)
+	//USceneComponent* CoverCheckPosition;
 	/**
 	 * Will move the character along the CurrentPath or do nothing to the character if the path is empty.
 	 */
 	void MoveAlongPath();
 
 	/**
-	 * Logic that controls the enemy character when in the Patrol state.
+	 * Logic that controls the enemy character when in Idle states.
 	 */
+	void TickGuard();
 	void TickPatrol();
+	void TickWander();
+	void TickInvestigate(float DeltaTime);
 	/**
-	 * Logic that controls the enemy character when in the Engage state.
+	 * Logic that controls the enemy character when in Combat states.
 	 */
-	void TickEngage();
-	/**
-	 * Logic that controls the enemy character when in the Evade state.
-	 */
-	void TickEvade();
+	void TickRetreat();
+	void TickHold();
+	void TickPush();
+	void TickScatter(float DeltaTime);
 
 	/**
 	 * A function bound to the UPawnSensingComponent's OnSeePawn event. This will set the SensedCharacter variable
@@ -91,6 +100,7 @@ protected:
 	 */
 	UPROPERTY()
 	APlayerCharacter* SensedCharacter = nullptr;
+	//TODO: Add SensedExplosive variable once the explosives have been implemented
 
 	/**
 	 * An array of vectors representing the current path that the agent is traversing along.
@@ -103,13 +113,91 @@ protected:
 	 * found in the tick function of this enemy character.
 	 */
 	UPROPERTY(EditAnywhere)
-	EEnemyState CurrentState = EEnemyState::Patrol;
+	EEnemyState CurrentState = EEnemyState::Guard;
 
 	/**
 	 * Some arbitrary error value for determining how close is close enough before moving onto the next step in the path.
 	 */
 	UPROPERTY(EditAnywhere)
 	float PathfindingError = 150.0f; // 150 cm from target by default.
+	
+	UPROPERTY(EditAnywhere)
+	float DetectionDelay = 1.0f;
+	UPROPERTY(EditAnywhere)
+	float ReturnToIdleDelay = 5.0f;
+	float DetectionTimer = 0.0f;
+	bool DetectedPlayer = false;
+	
+	UPROPERTY(EditAnywhere)
+	float InvestigateTimeout = 6.0f;
+	float InvestigateTimer = 0.0f;
+	UPROPERTY(EditAnywhere)
+	float InvestigateError = 100.0f;
+	
+	UPROPERTY(EditAnywhere)
+	float ScatterTimeout = 2.0f;
+	float ScatterTimer = 0.0f;
+	
+	FVector LastSeenPlayerLocation {};
+	FVector LastExplosiveLocation {};
+	float LastSeenPlayerHealth = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AEnemyCharacter*> SquadMates;
+
+	//Value used to measure enemy's confidence in combat and control behaviours
+	float CurrentMorale = 0.0f;
+	//Value added based on own health ratio
+	UPROPERTY(EditAnywhere)
+	float HealthMoraleContribution = 3.0f; 
+	//Value added to morale per squad mate
+	UPROPERTY(EditAnywhere)
+	float SquadMateMoraleContribution = 1.5f; 
+	//Value subtracted based on player health ratio
+	UPROPERTY(EditAnywhere)
+	float PlayerHealthMoraleContribution = 2.0f; 
+	void UpdateMorale();
+	//Below this value, the enemy retreats during combat
+	UPROPERTY(EditAnywhere)
+	float MoraleRetreatCutoff = 1.0f; 
+	//Above this value, the enemy pushes forward during combat
+	UPROPERTY(EditAnywhere)
+	float MoralePushCutoff = 3.0f; 
+
+	//Determines whether enemy uses Guard or Patrol state when idle
+	UPROPERTY(EditAnywhere)
+	bool PatrolDuty = false; 
+	UPROPERTY()
+	bool InCover = false;
+	UPROPERTY(EditAnywhere)
+	float CoverCheckDistance = 200.0f;
+	UPROPERTY(EditAnywhere)
+	FVector CoverCheckOffset = FVector(0.0f,0.0f,15.0f);
+	void UpdateCover();
+
+	//Temporary variable until treasure is implemented
+	UPROPERTY(EditAnywhere)
+	FVector TreasureLocation = FVector::Zero(); 
+	//Temporary variable until treasure is implemented
+	UPROPERTY(EditAnywhere)
+	bool TreasureSecure = true; 
+	//Radius around Treasure to patrol and hold position within
+	UPROPERTY(EditAnywhere)
+	float TerritoryRadius = 400.0f; 
+
+	UPROPERTY()
+	FVector GuardLocation {};
+	//How far enemy can be from their guard position during guard state
+	UPROPERTY(EditAnywhere)
+	float GuardError = 100.0f; 
+
+	void EnterCombat();
+	void EnterIdle();
+	bool IsInCombat() const;
+	void ReceiveCallout(APlayerCharacter* SensedPlayer);
+	void SendCallouts();
+	FVector FindNearbyCoverLocation(const FVector& StartLocation) const;
+	void AddSquadMate(AEnemyCharacter* NewSquadMate);
 
 public:	
 
@@ -123,5 +211,7 @@ private:
 	 * @return A pointer to one APlayerCharacter actor in the world.
 	 */
 	APlayerCharacter* FindPlayer() const;
+
+	FVector GetCurrOrLastPlayerPos() const;
 
 };

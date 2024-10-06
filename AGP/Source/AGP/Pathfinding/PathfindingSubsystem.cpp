@@ -40,6 +40,16 @@ TArray<FVector> UPathfindingSubsystem::GetPathAway(const FVector& StartLocation,
 	return GetPath(FindNearestNode(StartLocation), FindFurthestNode(TargetLocation));
 }
 
+FVector UPathfindingSubsystem::GetPosInDirection(const FVector& StartLocation, const FVector& TargetDirection)
+{
+	return GetNeighbourNodeInDirection(FindNearestNode(StartLocation), TargetDirection.GetSafeNormal())->GetActorLocation();
+}
+
+FVector UPathfindingSubsystem::FindNearestNodePos(const FVector& TargetLocation)
+{
+	return FindNearestNode(TargetLocation)->GetActorLocation();
+}
+
 void UPathfindingSubsystem::PlaceProceduralNodes(const TArray<FVector>& LandscapeVertexData, int32 MapWidth, int32 MapHeight)
 {
 	// Need to destroy all of the current nodes in the world.
@@ -183,6 +193,32 @@ ANavigationNode* UPathfindingSubsystem::FindFurthestNode(const FVector& TargetLo
 	}
 
 	return FurthestNode;
+}
+
+ANavigationNode* UPathfindingSubsystem::GetNeighbourNodeInDirection(ANavigationNode* StartNode, const FVector& TargetDirection)
+{
+	if(StartNode->ConnectedNodes.Num() == 0)
+	{
+		return nullptr;
+	}
+	
+	ANavigationNode* BestNode {};
+	float BestDot {};
+
+	for(int i = 0; i < StartNode->ConnectedNodes.Num(); ++i)
+	{
+		ANavigationNode* OtherNode = StartNode->ConnectedNodes[i];
+		FVector DirectionToOtherNode = OtherNode->GetActorLocation() - StartNode->GetActorLocation();
+		DirectionToOtherNode.Normalize();
+		float DotWithOtherNode = DirectionToOtherNode.Dot(TargetDirection);
+		if(i == 0 || DotWithOtherNode > BestDot)
+		{
+			BestNode = OtherNode;
+			BestDot = DotWithOtherNode;
+		}
+	}
+
+	return BestNode;
 }
 
 TArray<FVector> UPathfindingSubsystem::GetPath(ANavigationNode* StartNode, ANavigationNode* EndNode)

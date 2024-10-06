@@ -72,3 +72,7 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+/AGP/Binaries/*
+/AGP/Intermediate/*
+/AGP/Intermediate/Build
+/AGP/Saved

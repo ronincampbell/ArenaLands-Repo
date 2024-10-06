@@ -15,6 +15,8 @@ UCLASS()
 class AGP_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
+	
+	friend class AEnemyCharacter;
 
 public:
 	// Sets default values for this character's properties
