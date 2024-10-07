@@ -75,6 +75,8 @@ protected:
 	 */
 	UFUNCTION()
 	void OnSensedPawn(APawn* SensedActor);
+	
+	void OnHearExplosion(const FVector& ExplosionLocation);
 	/**
 	 * Will update the SensedCharacter variable based on whether the UPawnSensingComponent has a line of sight to the
 	 * Player Character or not. This may cause the SensedCharacter variable to become a nullptr so be careful when using
@@ -189,7 +191,10 @@ protected:
 	FVector GuardLocation {};
 	//How far enemy can be from their guard position during guard state
 	UPROPERTY(EditAnywhere)
-	float GuardError = 100.0f; 
+	float GuardError = 100.0f;
+	//Distance from the treasure to select guard positions from
+	UPROPERTY(EditAnywhere)
+	float GuardRadius = 100.0f; 
 
 	void EnterCombat();
 	void EnterIdle();

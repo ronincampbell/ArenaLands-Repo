@@ -46,10 +46,8 @@ void AEnemyCharacter::BeginPlay()
 			SquadMate->AddSquadMate(this);
 		}
 	}
-
-	//Just using spawn position as guard position for now
-	//TODO: Properly select a guard position at a small radius around treasure
-	GuardLocation = GetActorLocation();
+	
+	GuardLocation = PathfindingSubsystem->FindNearestNodePos(TreasureLocation+FMath::VRand().GetSafeNormal2D()*GuardRadius);
 }
 
 void AEnemyCharacter::MoveAlongPath()
@@ -77,11 +75,7 @@ void AEnemyCharacter::TickGuard()
 	//Potentially could distribute look direction with other guarding squad mates
 	if(CurrentPath.IsEmpty())
 	{
-		UpdateCover();
-		if(!InCover || FVector::Distance(GetActorLocation(), GuardLocation) > GuardError)
-		{
-			CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearbyCoverLocation(GuardLocation));
-		}
+		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GuardLocation);
 	}
 
 	MoveAlongPath();
@@ -93,7 +87,7 @@ void AEnemyCharacter::TickPatrol()
 
 	if(CurrentPath.IsEmpty())
 	{
-		const FVector RandOffset = FMath::VRand().GetSafeNormal2D();
+		const FVector RandOffset = FMath::VRand().GetSafeNormal2D()*TerritoryRadius;
 		const FVector PatrolLocation = TreasureLocation + RandOffset;
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), PatrolLocation);
 	}
@@ -176,8 +170,8 @@ void AEnemyCharacter::TickScatter(float DeltaTime)
 		CurrentPath.Add(PathfindingSubsystem->GetPosInDirection(GetActorLocation(), ScatterDirection));
 	}
 
-	ScatterTimer += DeltaTime;
-	if(ScatterTimer > ScatterTimeout)
+	ScatterTimer -= DeltaTime;
+	if(ScatterTimer <= 0.0f)
 	{
 		ScatterTimer = 0.0f;
 		if(DetectedPlayer)
@@ -200,8 +194,14 @@ void AEnemyCharacter::OnSensedPawn(APawn* SensedActor)
 		SensedCharacter = Player;
 		//UE_LOG(LogTemp, Display, TEXT("Sensed Player"))
 	}
+}
 
-	//TODO: Add code for detecting explosives
+void AEnemyCharacter::OnHearExplosion(const FVector& ExplosionLocation)
+{
+	LastExplosiveLocation = ExplosionLocation;
+	ScatterTimer = ScatterTimeout;
+	CurrentPath.Empty();
+	CurrentState = EEnemyState::Scatter;
 }
 
 void AEnemyCharacter::UpdateSight()
@@ -216,7 +216,6 @@ void AEnemyCharacter::UpdateSight()
 			SensedCharacter = nullptr;
 			//UE_LOG(LogTemp, Display, TEXT("Lost Player"))
 		}
-		//TODO: Add code to handle losing sight of explosives (maybe)
 	}
 }
 
@@ -402,9 +401,14 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 	UpdateSight();
 	UpdateMorale();
-	
+
+	if(ScatterTimer > 0)
+	{
+		//This space intentionally left blank
+		//This condition just prevents the detection code from running and interrupting scattering
+	}
 	//If player is spotted while idle
-	if(SensedCharacter && !DetectedPlayer)
+	else if(SensedCharacter && !DetectedPlayer)
 	{
 		DetectionTimer += DeltaTime;
 
