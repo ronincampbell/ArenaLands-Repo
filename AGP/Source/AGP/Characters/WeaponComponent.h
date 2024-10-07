@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -24,6 +22,8 @@ public:
 	float BaseDamage = 10.0f;
 	int32 MagazineSize = 5;
 	float ReloadTime = 1.0f;
+	bool IsExplosive = false;
+	float ExplosionRadius = 200.0f;
 
 	/**
 	 * A debug ToString function that allows the easier printing of the weapon stats.
@@ -32,11 +32,11 @@ public:
 	FString ToString() const
 	{
 		FString WeaponString = "";
-		WeaponString += "Accuracy:      " + FString::SanitizeFloat(Accuracy) + "\n";
 		WeaponString += "Fire Rate:     " + FString::SanitizeFloat(FireRate) + "\n";
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
 		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime);
+		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False");
 		return WeaponString;
 	}
 };
@@ -78,5 +78,4 @@ private:
 	 */
 	void CompleteReload();
 	float CurrentReloadDuration = 0.0f;
-		
 };

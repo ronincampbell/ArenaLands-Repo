@@ -1,0 +1,16 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/Users/Fuzzy/Documents/Unreal Projects/ArenaLands-Repo/AGP/Content/Models/LittleGuyRemake.uasset",
+				"C:/Users/Fuzzy/Documents/Unreal Projects/ArenaLands-Repo/AGP/Content/Models/standardSurface1.uasset",
+				"C:/Users/Fuzzy/Documents/Unreal Projects/ArenaLands-Repo/AGP/Content/FirstPersonContent/Weapon/Mesh/SK_FPGun_Skeleton.uasset",
+				"C:/Users/Fuzzy/Documents/Unreal Projects/ArenaLands-Repo/AGP/Content/Blueprints/BP_PlayerCharacter.uasset",
+				"C:/Users/Fuzzy/Documents/Unreal Projects/ArenaLands-Repo/AGP/Content/__ExternalActors__/Levels/TestingMap/2/KR/1FSZ8INGRL10KXP07TXYAD.uasset"
+			]
+		}
+	]
+}

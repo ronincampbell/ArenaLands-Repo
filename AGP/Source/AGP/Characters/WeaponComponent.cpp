@@ -1,19 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "WeaponComponent.h"
-
 #include "BaseCharacter.h"
 #include "HealthComponent.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLocation)
@@ -46,27 +38,63 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(GetOwner());
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+	if (!WeaponStats.IsExplosive)
 	{
-		if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
+		// Standard Weapon Logic
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 		{
-			if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
+			if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
 			{
-				HitCharacterHealth->ApplyDamage(WeaponStats.BaseDamage);
+				if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
+				{
+					HitCharacterHealth->ApplyDamage(WeaponStats.BaseDamage);
+				}
+				DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Green, false, 1.0f);
 			}
-			DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Green, false, 1.0f);
+			else
+			{
+				DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Orange, false, 1.0f);
+			}
+		
 		}
 		else
 		{
-			DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Orange, false, 1.0f);
+			DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
 		}
-		
-	}
-	else
-	{
-		DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
-	}
+	} 
+    else
+    {
+        // Explosive Weapon Logic
+    	if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+    	{
+    		// Explosive hit something
+    		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
 
+    		// Apply radial damage in a sphere around the impact point
+    		TArray<FHitResult> HitResults;
+    		FCollisionShape ExplosionSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius);
+
+    		// Perform the sphere sweep to detect nearby actors
+    		if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, ExplosionSphere, QueryParams))
+    		{
+    			for (auto& ExplosionHit : HitResults)
+    			{
+    				if (ABaseCharacter* AffectedCharacter = Cast<ABaseCharacter>(ExplosionHit.GetActor()))
+    				{
+    					if (UHealthComponent* AffectedHealth = AffectedCharacter->GetComponentByClass<UHealthComponent>())
+    					{
+    						AffectedHealth->ApplyDamage(WeaponStats.BaseDamage);
+    					}
+    				}
+    			}
+    		}
+    		else
+    		{
+    			// No hit - Draw debug sphere at the impact point
+    			DrawDebugSphere(GetWorld(), AccuracyAdjustedFireAt, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
+    		}
+    	}
+    }
 	TimeSinceLastShot = 0.0f;
 	RoundsRemainingInMagazine--;
 	return true;
@@ -107,8 +135,6 @@ void UWeaponComponent::BeginPlay()
 	// ...
 }
 
-
-
 // Called every frame
 void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -127,4 +153,3 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		}
 	}
 }
-

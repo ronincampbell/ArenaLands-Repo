@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,9 +14,16 @@ enum class EWeaponRarity : uint8
 	Legendary
 };
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class EWeaponModification : uint8
+{
+	FireRate,
+	BaseDamage,
+	MagazineSize,
+	ReloadTime,
+	IsExplosive
+};
+
 UCLASS()
 class AGP_API AWeaponPickup : public APickupBase
 {
@@ -28,6 +33,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EWeaponRarity WeaponRarity = EWeaponRarity::Common;
+	
 	FWeaponStats WeaponStats;
 
 	virtual void BeginPlay() override;
@@ -36,11 +42,10 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateWeaponPickupMaterial();
-	
-private:
 
+private:
 	void GenerateWeaponPickup();
 	EWeaponRarity WeaponRarityPicker();
-	TArray<bool> WeaponStatPicker(int32 NumOfGood, int32 NumOfStats);
-	
+	TArray<EWeaponModification> GenerateWeaponModifications(int32 NumModifications);
+	void ApplyWeaponModifications(const TArray<EWeaponModification>& Modifications);
 };
