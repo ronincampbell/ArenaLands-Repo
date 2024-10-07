@@ -14,12 +14,12 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define AGP_WeaponPickup_generated_h
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_SPARSE_DATA
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_RPC_WRAPPERS
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_RPC_WRAPPERS_NO_PURE_DECLS
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_ACCESSORS
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_CALLBACK_WRAPPERS
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_INCLASS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_SPARSE_DATA
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_RPC_WRAPPERS
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_RPC_WRAPPERS_NO_PURE_DECLS
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_ACCESSORS
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_CALLBACK_WRAPPERS
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAWeaponPickup(); \
 	friend struct Z_Construct_UClass_AWeaponPickup_Statics; \
@@ -28,7 +28,7 @@ public: \
 	DECLARE_SERIALIZER(AWeaponPickup)
 
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_INCLASS \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_INCLASS \
 private: \
 	static void StaticRegisterNativesAWeaponPickup(); \
 	friend struct Z_Construct_UClass_AWeaponPickup_Statics; \
@@ -37,7 +37,7 @@ public: \
 	DECLARE_SERIALIZER(AWeaponPickup)
 
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_STANDARD_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API AWeaponPickup(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AWeaponPickup) \
@@ -51,7 +51,7 @@ public: \
 	NO_API virtual ~AWeaponPickup();
 
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_ENHANCED_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_ENHANCED_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API AWeaponPickup(); \
 private: \
@@ -65,29 +65,29 @@ public: \
 	NO_API virtual ~AWeaponPickup();
 
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_26_PROLOG
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_GENERATED_BODY_LEGACY \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_27_PROLOG
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_SPARSE_DATA \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_RPC_WRAPPERS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_ACCESSORS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_CALLBACK_WRAPPERS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_INCLASS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_STANDARD_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_SPARSE_DATA \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_RPC_WRAPPERS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_ACCESSORS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_CALLBACK_WRAPPERS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_INCLASS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_GENERATED_BODY \
+#define FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_SPARSE_DATA \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_ACCESSORS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_CALLBACK_WRAPPERS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_INCLASS_NO_PURE_DECLS \
-	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_29_ENHANCED_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_SPARSE_DATA \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_ACCESSORS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_CALLBACK_WRAPPERS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_INCLASS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Pickups_WeaponPickup_h_30_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -112,7 +112,8 @@ template<> AGP_API UEnum* StaticEnum<EWeaponRarity>();
 	op(EWeaponModification::FireRate) \
 	op(EWeaponModification::BaseDamage) \
 	op(EWeaponModification::MagazineSize) \
-	op(EWeaponModification::ReloadTime) 
+	op(EWeaponModification::ReloadTime) \
+	op(EWeaponModification::IsExplosive) 
 
 enum class EWeaponModification : uint8;
 template<> struct TIsUEnumClass<EWeaponModification> { enum { Value = true }; };

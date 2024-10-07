@@ -21,11 +21,11 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 
 template<> AGP_API UScriptStruct* StaticStruct<struct FWeaponStats>();
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_SPARSE_DATA
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_RPC_WRAPPERS
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_RPC_WRAPPERS_NO_PURE_DECLS
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_ACCESSORS
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_INCLASS_NO_PURE_DECLS \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_SPARSE_DATA
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_RPC_WRAPPERS
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_RPC_WRAPPERS_NO_PURE_DECLS
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_ACCESSORS
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUWeaponComponent(); \
 	friend struct Z_Construct_UClass_UWeaponComponent_Statics; \
@@ -34,7 +34,7 @@ public: \
 	DECLARE_SERIALIZER(UWeaponComponent)
 
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_INCLASS \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_INCLASS \
 private: \
 	static void StaticRegisterNativesUWeaponComponent(); \
 	friend struct Z_Construct_UClass_UWeaponComponent_Statics; \
@@ -43,7 +43,7 @@ public: \
 	DECLARE_SERIALIZER(UWeaponComponent)
 
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_STANDARD_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API UWeaponComponent(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UWeaponComponent) \
@@ -57,7 +57,7 @@ public: \
 	NO_API virtual ~UWeaponComponent();
 
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_ENHANCED_CONSTRUCTORS \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API UWeaponComponent(UWeaponComponent&&); \
@@ -69,27 +69,27 @@ public: \
 	NO_API virtual ~UWeaponComponent();
 
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_41_PROLOG
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_GENERATED_BODY_LEGACY \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_PROLOG
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_SPARSE_DATA \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_RPC_WRAPPERS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_ACCESSORS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_INCLASS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_STANDARD_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_SPARSE_DATA \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_RPC_WRAPPERS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_ACCESSORS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_INCLASS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_GENERATED_BODY \
+#define FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_SPARSE_DATA \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_ACCESSORS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_INCLASS_NO_PURE_DECLS \
-	FID_AGP_Source_AGP_Characters_WeaponComponent_h_44_ENHANCED_CONSTRUCTORS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_SPARSE_DATA \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_ACCESSORS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_INCLASS_NO_PURE_DECLS \
+	FID_AGP_Source_AGP_Characters_WeaponComponent_h_47_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 

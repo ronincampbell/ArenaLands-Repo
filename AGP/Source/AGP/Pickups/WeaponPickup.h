@@ -20,7 +20,8 @@ enum class EWeaponModification : uint8
 	FireRate,
 	BaseDamage,
 	MagazineSize,
-	ReloadTime
+	ReloadTime,
+	IsExplosive
 };
 
 UCLASS()

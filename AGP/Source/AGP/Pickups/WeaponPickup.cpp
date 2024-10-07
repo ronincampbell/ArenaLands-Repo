@@ -47,7 +47,7 @@ void AWeaponPickup::GenerateWeaponPickup()
 TArray<EWeaponModification> AWeaponPickup::GenerateWeaponModifications(int32 NumModifications)
 {
 	TArray<EWeaponModification> Modifications;
-	TArray<EWeaponModification> PossibleMods = {EWeaponModification::FireRate, EWeaponModification::BaseDamage, EWeaponModification::MagazineSize, EWeaponModification::ReloadTime};
+	TArray<EWeaponModification> PossibleMods = {EWeaponModification::FireRate, EWeaponModification::BaseDamage, EWeaponModification::MagazineSize, EWeaponModification::ReloadTime, EWeaponModification::IsExplosive};
 
 	for (int32 i = 0; i < NumModifications; i++)
 	{
@@ -80,6 +80,9 @@ void AWeaponPickup::ApplyWeaponModifications(const TArray<EWeaponModification>& 
 			WeaponStats.ReloadTime *= 0.7f; // Decrease reload time by 30%
 			//UE_LOG(LogTemp, Display, TEXT("Reload Time Mod Equipped"));
 			break;
+        case EWeaponModification::IsExplosive:
+            WeaponStats.IsExplosive = true;
+            break;
 		}
 	}
 }

@@ -22,6 +22,8 @@ public:
 	float BaseDamage = 10.0f;
 	int32 MagazineSize = 5;
 	float ReloadTime = 1.0f;
+	bool IsExplosive = false;
+	float ExplosionRadius = 200.0f;
 
 	/**
 	 * A debug ToString function that allows the easier printing of the weapon stats.
@@ -34,6 +36,7 @@ public:
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
 		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime);
+		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False");
 		return WeaponString;
 	}
 };
