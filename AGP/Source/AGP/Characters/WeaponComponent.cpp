@@ -141,6 +141,9 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	TimeSinceLastShot += DeltaTime;
 
+	UIAmmoRemaining = RoundsRemainingInMagazine;
+	UIMagazineSize = WeaponStats.MagazineSize;
+
 	// Logic that delays the call to CompleteReload if the weapon is currently being reloaded.
 	if (bIsReloading)
 	{

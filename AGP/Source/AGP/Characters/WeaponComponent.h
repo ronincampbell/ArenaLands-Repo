@@ -59,6 +59,11 @@ public:
 
 	bool IsMagazineEmpty();
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int32 UIAmmoRemaining;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int32 UIMagazineSize;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
