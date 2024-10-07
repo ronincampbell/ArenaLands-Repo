@@ -28,7 +28,7 @@ void AEnemyCharacter::BeginPlay()
 	PathfindingSubsystem = GetWorld()->GetSubsystem<UPathfindingSubsystem>();
 	if (PathfindingSubsystem)
 	{
-		CurrentPath = PathfindingSubsystem->GetRandomPath(GetActorLocation());
+		//CurrentPath = PathfindingSubsystem->GetRandomPath(GetActorLocation());
 	} else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to find the PathfindingSubsystem"))
@@ -46,8 +46,16 @@ void AEnemyCharacter::BeginPlay()
 			SquadMate->AddSquadMate(this);
 		}
 	}
-	
-	GuardLocation = PathfindingSubsystem->FindNearestNodePos(TreasureLocation+FMath::VRand().GetSafeNormal2D()*GuardRadius);
+
+	if(HasTreasure())
+	{
+		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+FMath::VRand().GetSafeNormal2D()*GuardRadius);
+	}
+	else
+	{
+		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
+	}
+	//CurrentPath.Add(GuardLocation);
 }
 
 void AEnemyCharacter::MoveAlongPath()
@@ -87,8 +95,13 @@ void AEnemyCharacter::TickPatrol()
 
 	if(CurrentPath.IsEmpty())
 	{
+		if(!HasTreasure())
+		{
+			EnterIdle();
+			return;
+		}
 		const FVector RandOffset = FMath::VRand().GetSafeNormal2D()*TerritoryRadius;
-		const FVector PatrolLocation = TreasureLocation + RandOffset;
+		const FVector PatrolLocation = Treasure->GetActorLocation() + RandOffset;
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), PatrolLocation);
 	}
 
@@ -137,18 +150,53 @@ void AEnemyCharacter::TickRetreat()
 	MoveAlongPath();
 }
 
-void AEnemyCharacter::TickHold()
+void AEnemyCharacter::TickHold(float DeltaTime)
 {
+	UpdateCover();
 	if(CurrentPath.IsEmpty())
 	{
-		UpdateCover();
 		if(!InCover)
 		{
-			CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearbyCoverLocation(GetActorLocation()));
+			if(HasTreasure())
+			{
+				CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearestCoverLocation(Treasure->GetActorLocation()));
+			}
+			else
+			{
+				CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearestCoverLocation(GetActorLocation()));
+			}
 		}
 	}
 
 	MoveAlongPath();
+	
+	if(!InCover)
+	{
+		UnCrouch();
+		UE_LOG(LogTemp, Display, TEXT("Early Return"))
+		return;
+	}
+
+	CoverTimer += DeltaTime;
+	if(bIsCrouched)
+	{
+		if(CoverTimer > MinimumHideDuration && (!HasWeapon() || !WeaponComponent->IsMagazineEmpty()))
+		{
+			UnCrouch();
+			CoverTimer = 0.0f;
+		}
+	}
+	else
+	{
+		Fire(GetCurrOrLastPlayerPos());
+		
+		if(CoverTimer > MaximumPopupDuration || (HasWeapon() && WeaponComponent->IsMagazineEmpty()))
+		{
+			Crouch();
+			CoverTimer = 0.0f;
+		}
+	}
+
 }
 
 void AEnemyCharacter::TickPush()
@@ -159,6 +207,7 @@ void AEnemyCharacter::TickPush()
 	}
 
 	MoveAlongPath();
+	Fire(GetCurrOrLastPlayerPos());
 }
 
 void AEnemyCharacter::TickScatter(float DeltaTime)
@@ -191,8 +240,9 @@ void AEnemyCharacter::OnSensedPawn(APawn* SensedActor)
 {
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(SensedActor))
 	{
-		SensedCharacter = Player;
-		//UE_LOG(LogTemp, Display, TEXT("Sensed Player"))
+		if(!Player->IsSpectator()){
+			SensedCharacter = Player;
+		}
 	}
 }
 
@@ -242,22 +292,32 @@ void AEnemyCharacter::UpdateMorale()
 
 void AEnemyCharacter::UpdateCover()
 {
-	FVector PlayerPosition = GetCurrOrLastPlayerPos();
+	FVector PlayerPosition = GetCurrOrLastPlayerPos() + PlayerHeadOffset;
 	
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation() + CoverCheckOffset, PlayerPosition, ECC_WorldStatic, QueryParams))
+	for(AEnemyCharacter* SquadMate : SquadMates)
+	{
+		QueryParams.AddIgnoredActor(SquadMate);
+	}
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation() + FootOffset + CoverCheckOffset, PlayerPosition, ECC_WorldStatic, QueryParams))
 	{
 		//If the line trace didn't hit the player
 		//ie. Cover intercepted the line
 		if (!Cast<APlayerCharacter>(HitResult.GetActor()))
 		{
 			InCover = true;
+			return;
 		}
 	}
 
 	InCover = false;
+}
+
+bool AEnemyCharacter::HasTreasure()
+{
+	return IsValid(Treasure);
 }
 
 void AEnemyCharacter::EnterCombat()
@@ -286,7 +346,7 @@ void AEnemyCharacter::EnterCombat()
 void AEnemyCharacter::EnterIdle()
 {
 	EEnemyState DesiredState {};
-	if(!TreasureSecure)
+	if(!HasTreasure())
 	{
 		DesiredState = EEnemyState::Wander;
 	}
@@ -334,34 +394,58 @@ void AEnemyCharacter::SendCallouts()
 	}
 }
 
-FVector AEnemyCharacter::FindNearbyCoverLocation(const FVector& StartLocation) const
+FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) const
 {
+	FVector NearestPos{};
+	bool FoundCover = false;
 	for(FVector NodePos : PathfindingSubsystem->GetWaypointPositions())
 	{
-		if(FVector::Distance(StartLocation, NodePos) > CoverCheckDistance)
+		float NodeDistance = FVector::Distance(StartLocation, NodePos);
+		if(NodeDistance > CoverCheckDistance)
 		{
 			continue;
 		}
 
 		FVector CheckPosition = NodePos + CoverCheckOffset;
-		FVector PlayerPosition = GetCurrOrLastPlayerPos();
+		FVector PlayerPosition = GetCurrOrLastPlayerPos()+PlayerHeadOffset;
 
 		FHitResult HitResult;
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
+		for(AEnemyCharacter* SquadMate : SquadMates)
+		{
+			QueryParams.AddIgnoredActor(SquadMate);
+		}
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, CheckPosition, PlayerPosition, ECC_WorldStatic, QueryParams))
 		{
 			//If the line trace didn't hit the player
 			//ie. Cover intercepted the line
 			if (!Cast<APlayerCharacter>(HitResult.GetActor()))
 			{
-				return NodePos;
+				if(!FoundCover)
+				{
+					NearestPos = NodePos;
+					FoundCover = true;
+				}
+				else
+				{
+					if(NodeDistance < FVector::Distance(StartLocation, NearestPos))
+					{
+						NearestPos = NodePos;
+					}
+				}
 			}
 		}
 	}
 
-	//No cover found
-	return StartLocation;
+	if(!FoundCover)
+	{
+		return StartLocation;		
+	}
+	else
+	{
+		return NearestPos;
+	}
 }
 
 void AEnemyCharacter::AddSquadMate(AEnemyCharacter* NewSquadMate)
@@ -399,6 +483,14 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		return;
 	}
 
+	if(HasWeapon())
+	{
+		if(WeaponComponent->IsMagazineEmpty())
+		{
+			Reload();
+		}
+	}
+	
 	UpdateSight();
 	UpdateMorale();
 
@@ -419,7 +511,10 @@ void AEnemyCharacter::Tick(float DeltaTime)
 			DetectionTimer = ReturnToIdleDelay;
 			DetectedPlayer = true;
 			//Inform squad of player position
-			SendCallouts();
+			if(HasTreasure())
+			{
+				SendCallouts();
+			}
 			EnterCombat();
 		}
 	}
@@ -449,38 +544,44 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if(bIsCrouched && CurrentState != EEnemyState::Hold)
+	{
+		UnCrouch();
+		CoverTimer = 0.0f;
+	}
+	
 	switch(CurrentState){
 	case EEnemyState::Guard:
 		TickGuard();
-	UE_LOG(LogTemp, Display, TEXT("State: Guard"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Guard"))
 		break;
 	case EEnemyState::Patrol:
 		TickPatrol();
-	UE_LOG(LogTemp, Display, TEXT("State: Patrol"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Patrol"))
 		break;
 	case EEnemyState::Investigate:
 		TickInvestigate(DeltaTime);
-	UE_LOG(LogTemp, Display, TEXT("State: Investigate"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Investigate"))
 		break;
 	case EEnemyState::Wander:
 		TickWander();
-	UE_LOG(LogTemp, Display, TEXT("State: Wander"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Wander"))
 		break;
 	case EEnemyState::Hold:
-		TickHold();
-	UE_LOG(LogTemp, Display, TEXT("State: Hold"))
+		TickHold(DeltaTime);
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Hold"))
 		break;
 	case EEnemyState::Push:
 		TickPush();
-	UE_LOG(LogTemp, Display, TEXT("State: Push"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Push"))
 		break;
 	case EEnemyState::Retreat:
 		TickRetreat();
-	UE_LOG(LogTemp, Display, TEXT("State: Retreat"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Retreat"))
 		break;
 	case EEnemyState::Scatter:
 		TickScatter(DeltaTime);
-	UE_LOG(LogTemp, Display, TEXT("State: Scatter"))
+		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Scatter"))
 		break;
 	}
 
@@ -518,8 +619,6 @@ FVector AEnemyCharacter::GetCurrOrLastPlayerPos() const
 	{
 		return SensedCharacter->GetActorLocation();
 	}
-	else
-	{
-		return LastSeenPlayerLocation;
-	}
+	
+	return LastSeenPlayerLocation;
 }
