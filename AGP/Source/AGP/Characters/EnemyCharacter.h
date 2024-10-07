@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.h"
 #include "PlayerCharacter.h"
+#include "AGP/Pickups/TreasurePickup.h"
 #include "EnemyCharacter.generated.h"
 
 // Forward declarations to avoid needing to #include files in the header of this class.
@@ -64,7 +65,7 @@ protected:
 	 * Logic that controls the enemy character when in Combat states.
 	 */
 	void TickRetreat();
-	void TickHold();
+	void TickHold(float DeltaTime);
 	void TickPush();
 	void TickScatter(float DeltaTime);
 
@@ -148,6 +149,7 @@ protected:
 	TArray<AEnemyCharacter*> SquadMates;
 
 	//Value used to measure enemy's confidence in combat and control behaviours
+	UPROPERTY(VisibleAnywhere)
 	float CurrentMorale = 0.0f;
 	//Value added based on own health ratio
 	UPROPERTY(EditAnywhere)
@@ -173,16 +175,23 @@ protected:
 	bool InCover = false;
 	UPROPERTY(EditAnywhere)
 	float CoverCheckDistance = 200.0f;
+	FVector FootOffset = FVector(0.0f, 0.0f, -88.0f);
+	FVector PlayerHeadOffset = FVector(0.0f, 0.0f, 60.0f);
 	UPROPERTY(EditAnywhere)
 	FVector CoverCheckOffset = FVector(0.0f,0.0f,15.0f);
 	void UpdateCover();
+	//Longest time enemy can spend standing from cover to fire
+	UPROPERTY(EditAnywhere)
+	float MaximumPopupDuration = 1.5f;
+	//Shortest time enemy can spend crouching behind cover
+	UPROPERTY(EditAnywhere)
+	float MinimumHideDuration = 2.0f;
+	float CoverTimer = 0.0f;
 
-	//Temporary variable until treasure is implemented
+	//Treasure that enemy is trying to protect, defines center of territory
 	UPROPERTY(EditAnywhere)
-	FVector TreasureLocation = FVector::Zero(); 
-	//Temporary variable until treasure is implemented
-	UPROPERTY(EditAnywhere)
-	bool TreasureSecure = true; 
+	ATreasurePickup* Treasure = nullptr;
+	bool HasTreasure();
 	//Radius around Treasure to patrol and hold position within
 	UPROPERTY(EditAnywhere)
 	float TerritoryRadius = 400.0f; 
@@ -194,14 +203,17 @@ protected:
 	float GuardError = 100.0f;
 	//Distance from the treasure to select guard positions from
 	UPROPERTY(EditAnywhere)
-	float GuardRadius = 100.0f; 
+	float GuardRadius = 100.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool bPrintState = false;
 
 	void EnterCombat();
 	void EnterIdle();
 	bool IsInCombat() const;
 	void ReceiveCallout(APlayerCharacter* SensedPlayer);
 	void SendCallouts();
-	FVector FindNearbyCoverLocation(const FVector& StartLocation) const;
+	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
 	void AddSquadMate(AEnemyCharacter* NewSquadMate);
 
 public:	

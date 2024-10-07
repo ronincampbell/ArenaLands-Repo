@@ -34,6 +34,8 @@ protected:
 	TArray<ANavigationNode*> ConnectedNodes;
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* LocationComponent;
+	UPROPERTY(EditAnywhere)
+	bool bAutoTwoWayConnect = true;
 
 public:	
 	// Called every frame

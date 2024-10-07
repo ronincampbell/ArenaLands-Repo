@@ -21,6 +21,7 @@ class AGP_API APlayerCharacter : public ABaseCharacter
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
+	bool IsSpectator();
 
 protected:
 	// Called when the game starts or when spawned
@@ -41,6 +42,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	float LookSensitivity = 0.5f;
+	UPROPERTY(EditAnywhere)
+	bool bIsSpectator = false;
 
 public:	
 	// Called every frame
