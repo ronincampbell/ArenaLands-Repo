@@ -63,6 +63,10 @@ public:
 	int32 UIAmmoRemaining;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	int32 UIMagazineSize;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float UIReloadSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool UIBIsReloading;
 
 protected:
 	// Called when the game starts
@@ -71,6 +75,7 @@ protected:
 	FWeaponStats WeaponStats;
 	int32 RoundsRemainingInMagazine;
 	float TimeSinceLastShot;
+	
 	bool bIsReloading = false;
 
 public:	

@@ -107,6 +107,7 @@ void UWeaponComponent::Reload()
 	
 	UE_LOG(LogTemp, Display, TEXT("Start Reload"))
 	bIsReloading = true;
+	UIBIsReloading = true;
 }
 
 void UWeaponComponent::CompleteReload()
@@ -120,6 +121,8 @@ void UWeaponComponent::SetWeaponStats(const FWeaponStats& WeaponInfo)
 	this->WeaponStats = WeaponInfo;
 	// Set the number of bullets to the magazine size
 	RoundsRemainingInMagazine = WeaponInfo.MagazineSize;
+
+	UIReloadSpeed = WeaponStats.ReloadTime;
 }
 
 bool UWeaponComponent::IsMagazineEmpty()
@@ -151,6 +154,7 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		if (CurrentReloadDuration >= WeaponStats.ReloadTime)
 		{
 			bIsReloading = false;
+			UIBIsReloading = false;
 			CompleteReload();
 			CurrentReloadDuration = 0.0f;
 		}
