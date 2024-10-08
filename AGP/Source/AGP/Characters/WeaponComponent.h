@@ -35,7 +35,7 @@ public:
 		WeaponString += "Fire Rate:     " + FString::SanitizeFloat(FireRate) + "\n";
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
-		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime);
+		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime) + "\n";
 		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False");
 		return WeaponString;
 	}

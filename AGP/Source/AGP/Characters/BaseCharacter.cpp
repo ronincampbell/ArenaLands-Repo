@@ -38,26 +38,38 @@ void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
 	bHasBaseDamageMod = false;
 	bHasMagazineSizeMod = false;
 	bHasReloadTimeMod = false;
+	bIsExplosive = false;
+	ActiveMods = "Equipped Mods: \n";
 
 	// Check for active modifications and set the corresponding bools to true
 	if (WeaponStats.FireRate < 0.2f)
 	{
 		bHasFireRateMod = true;
+		ActiveMods += "- Fire Rate Mod\n";
 	}
 
 	if (WeaponStats.BaseDamage > 10.0f)
 	{
 		bHasBaseDamageMod = true;
+		ActiveMods += "- Base Damage Mod\n";
 	}
 
 	if (WeaponStats.MagazineSize > 5)
 	{
 		bHasMagazineSizeMod = true;
+		ActiveMods += "- Magazine Size Mod\n";
 	}
 
 	if (WeaponStats.ReloadTime < 1.0f)
 	{
 		bHasReloadTimeMod = true;
+		ActiveMods += "- Reload Time Mod\n";
+	}
+
+	if (WeaponStats.IsExplosive)
+	{
+		bIsExplosive = true;
+		ActiveMods += "- Explosive Mod\n";
 	}
 }
 
