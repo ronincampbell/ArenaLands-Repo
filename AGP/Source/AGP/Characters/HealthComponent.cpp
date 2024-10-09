@@ -32,6 +32,7 @@ void UHealthComponent::ApplyDamage(float DamageAmount)
 {
 	if (bIsDead) return;
 	CurrentHealth -= DamageAmount;
+	UE_LOG(LogTemp, Display, TEXT("Took %f damage. Current health: %f"), DamageAmount, CurrentHealth);
 	if (CurrentHealth <= 0.0f)
 	{
 		OnDeath();
@@ -43,9 +44,9 @@ void UHealthComponent::ApplyHealing(float HealingAmount)
 {
 	if (bIsDead) return;
 	CurrentHealth += HealingAmount;
-	if (CurrentHealth > 100.0f)
+	if (CurrentHealth > 50.0f)
 	{
-		CurrentHealth = 100.0f;
+		CurrentHealth = 50.0f;
 	}
 }
 

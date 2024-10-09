@@ -39,6 +39,7 @@ void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
 	bHasMagazineSizeMod = false;
 	bHasReloadTimeMod = false;
 	bIsExplosive = false;
+	bIsShotgun = false;
 	ActiveMods = "Equipped Mods: \n";
 
 	// Check for active modifications and set the corresponding bools to true
