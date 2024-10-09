@@ -40,6 +40,13 @@ public:
 	bool bHasMagazineSizeMod = false;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool bHasReloadTimeMod = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bIsExplosive = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bIsShotgun = false;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FString ActiveMods = "Equipped Mods: \n";
 	
 
 protected:

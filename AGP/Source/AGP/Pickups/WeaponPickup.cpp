@@ -47,7 +47,7 @@ void AWeaponPickup::GenerateWeaponPickup()
 TArray<EWeaponModification> AWeaponPickup::GenerateWeaponModifications(int32 NumModifications)
 {
 	TArray<EWeaponModification> Modifications;
-	TArray<EWeaponModification> PossibleMods = {EWeaponModification::FireRate, EWeaponModification::BaseDamage, EWeaponModification::MagazineSize, EWeaponModification::ReloadTime, EWeaponModification::IsExplosive};
+	TArray<EWeaponModification> PossibleMods = {EWeaponModification::FireRate, EWeaponModification::BaseDamage, EWeaponModification::MagazineSize, EWeaponModification::ReloadTime, EWeaponModification::IsExplosive, EWeaponModification::IsShotgun};
 
 	for (int32 i = 0; i < NumModifications; i++)
 	{
@@ -83,6 +83,9 @@ void AWeaponPickup::ApplyWeaponModifications(const TArray<EWeaponModification>& 
         case EWeaponModification::IsExplosive:
             WeaponStats.IsExplosive = true;
             break;
+		case EWeaponModification::IsShotgun:
+			WeaponStats.IsShotgun = true;
+			break;
 		}
 	}
 }

@@ -23,6 +23,7 @@ public:
 	int32 MagazineSize = 5;
 	float ReloadTime = 1.0f;
 	bool IsExplosive = false;
+	bool IsShotgun = false;
 	float ExplosionRadius = 200.0f;
 
 	/**
@@ -35,8 +36,9 @@ public:
 		WeaponString += "Fire Rate:     " + FString::SanitizeFloat(FireRate) + "\n";
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
-		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime);
-		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False");
+		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime) + "\n";
+		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False") + "\n";
+		WeaponString += "Is Shotgun:    " + FString(IsShotgun ? "True" : "False");
 		return WeaponString;
 	}
 };
@@ -59,6 +61,15 @@ public:
 
 	bool IsMagazineEmpty();
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int32 UIAmmoRemaining;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	int32 UIMagazineSize;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float UIReloadSpeed;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool UIBIsReloading;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -66,6 +77,7 @@ protected:
 	FWeaponStats WeaponStats;
 	int32 RoundsRemainingInMagazine;
 	float TimeSinceLastShot;
+	
 	bool bIsReloading = false;
 
 public:	
