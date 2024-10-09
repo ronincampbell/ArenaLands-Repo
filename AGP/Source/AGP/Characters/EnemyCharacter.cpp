@@ -84,6 +84,15 @@ void AEnemyCharacter::TickGuard()
 	if(CurrentPath.IsEmpty())
 	{
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GuardLocation);
+
+		if(HasTreasure())
+		{
+			FVector DirectionFromTreasure = GetActorLocation() - Treasure->GetActorLocation();
+			FVector FlatDirection = DirectionFromTreasure.GetSafeNormal2D();
+
+			FRotator FlatRotation = FlatDirection.Rotation();
+			SetActorRotation(FlatRotation);
+		}
 	}
 
 	MoveAlongPath();
