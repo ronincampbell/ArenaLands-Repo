@@ -10,95 +10,146 @@ UWeaponComponent::UWeaponComponent()
 
 bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLocation)
 {
-	// Determine if the weapon is able to fire.
+	// Check if we can fire
 	if (TimeSinceLastShot < WeaponStats.FireRate || IsMagazineEmpty())
 	{
 		return false;
 	}
 
-	// In order to integrate the weapon accuracy, we will need some logic to shift the FireAtLocation.
-	// The general rule for the accuracy stat is:
-	// An accuracy of 1.0f will not change the FireAtLocation and it will hit directly where they are aiming.
-	// An accuracy of 0.0f will fire in some random direction completely disregarding the FireAtLocation.
-	// The closer to 1.0f, the closer the shot will land to their fire at location.
-	
-	// Creates a random direction vector.
-	FVector RandomFireAt = FMath::VRand();
-	float CurrentShotDistance = FVector::Distance(BulletStart, FireAtLocation);
-	// Makes that random direction vector the same length as the current shot between the bullet start and fire at location.
-	RandomFireAt *= CurrentShotDistance;
-	// Offsets the direction vector by the Bullet Start position making this RandomFireAt now contain a random position
-	// somewhere on the surface a sphere surrounding the bullet start position. The original FireAtLocation is also on
-	// the surface of this same sphere.
-	RandomFireAt += BulletStart;
-	// Now we just need to blend between these two positions based on the accuracy value.
-	FVector AccuracyAdjustedFireAt = FMath::Lerp(RandomFireAt, FireAtLocation, WeaponStats.Accuracy);
-	
-
-	FHitResult HitResult;
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(GetOwner());
-	if (!WeaponStats.IsExplosive)
+	// Check if shotgun mode is enabled
+	if (WeaponStats.IsShotgun)
 	{
-		// Standard Weapon Logic
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+		// Shotgun mode: Fire all remaining ammo
+		int32 NumProjectiles = RoundsRemainingInMagazine;
+
+		for (int32 i = 0; i < NumProjectiles; i++)
 		{
-			if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
+			// Apply random spread to each projectile
+			FVector RandomFireAt = FMath::VRand();
+			float CurrentShotDistance = FVector::Distance(BulletStart, FireAtLocation);
+			RandomFireAt *= CurrentShotDistance;
+			RandomFireAt += BulletStart;
+			FVector AccuracyAdjustedFireAt = FMath::Lerp(RandomFireAt, FireAtLocation, FMath::RandRange(0.8f, WeaponStats.Accuracy));
+
+			FHitResult HitResult;
+			FCollisionQueryParams QueryParams;
+			QueryParams.AddIgnoredActor(GetOwner());
+
+			if (!WeaponStats.IsExplosive)
 			{
-				if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
+				// Standard Shotgun Projectile Logic
+				if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 				{
-					HitCharacterHealth->ApplyDamage(WeaponStats.BaseDamage);
+					if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
+					{
+						if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
+						{
+							HitCharacterHealth->ApplyDamage(WeaponStats.BaseDamage);
+						}
+					}
+					DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Green, false, 1.0f);
+				}
+				else
+				{
+					DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+				}
+			}
+			else
+			{
+				// Shotgun with Explosive logic
+				if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+				{
+					// Explosive hit something
+					DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
+
+					// Apply radial damage in a sphere around the impact point
+					TArray<FHitResult> HitResults;
+					FCollisionShape ExplosionSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius);
+
+					if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, ExplosionSphere, QueryParams))
+					{
+						for (auto& ExplosionHit : HitResults)
+						{
+							if (ABaseCharacter* AffectedCharacter = Cast<ABaseCharacter>(ExplosionHit.GetActor()))
+							{
+								if (UHealthComponent* AffectedHealth = AffectedCharacter->GetComponentByClass<UHealthComponent>())
+								{
+									AffectedHealth->ApplyDamage(WeaponStats.BaseDamage);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Decrease magazine to zero after all shots fired
+		RoundsRemainingInMagazine = 0;
+	}
+	else
+	{
+		// Standard firing logic
+		FVector RandomFireAt = FMath::VRand();
+		float CurrentShotDistance = FVector::Distance(BulletStart, FireAtLocation);
+		RandomFireAt *= CurrentShotDistance;
+		RandomFireAt += BulletStart;
+		FVector AccuracyAdjustedFireAt = FMath::Lerp(RandomFireAt, FireAtLocation, WeaponStats.Accuracy);
+
+		FHitResult HitResult;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(GetOwner());
+
+		if (!WeaponStats.IsExplosive)
+		{
+			// Standard weapon logic
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+			{
+				if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
+				{
+					if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
+					{
+						HitCharacterHealth->ApplyDamage(WeaponStats.BaseDamage);
+					}
 				}
 				DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Green, false, 1.0f);
 			}
 			else
 			{
-				DrawDebugLine(GetWorld(), BulletStart, HitResult.ImpactPoint, FColor::Orange, false, 1.0f);
+				DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
 			}
-		
 		}
 		else
 		{
-			DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+			// Explosive weapon logic
+			if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
+			{
+				DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
+
+				TArray<FHitResult> HitResults;
+				FCollisionShape ExplosionSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius);
+
+				if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, ExplosionSphere, QueryParams))
+				{
+					for (auto& ExplosionHit : HitResults)
+					{
+						if (ABaseCharacter* AffectedCharacter = Cast<ABaseCharacter>(ExplosionHit.GetActor()))
+						{
+							if (UHealthComponent* AffectedHealth = AffectedCharacter->GetComponentByClass<UHealthComponent>())
+							{
+								AffectedHealth->ApplyDamage(WeaponStats.BaseDamage);
+							}
+						}
+					}
+				}
+			}
 		}
-	} 
-    else
-    {
-        // Explosive Weapon Logic
-    	if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
-    	{
-    		// Explosive hit something
-    		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
+		RoundsRemainingInMagazine--;
+	}
 
-    		// Apply radial damage in a sphere around the impact point
-    		TArray<FHitResult> HitResults;
-    		FCollisionShape ExplosionSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius);
-
-    		// Perform the sphere sweep to detect nearby actors
-    		if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, ExplosionSphere, QueryParams))
-    		{
-    			for (auto& ExplosionHit : HitResults)
-    			{
-    				if (ABaseCharacter* AffectedCharacter = Cast<ABaseCharacter>(ExplosionHit.GetActor()))
-    				{
-    					if (UHealthComponent* AffectedHealth = AffectedCharacter->GetComponentByClass<UHealthComponent>())
-    					{
-    						AffectedHealth->ApplyDamage(WeaponStats.BaseDamage);
-    					}
-    				}
-    			}
-    		}
-    		else
-    		{
-    			// No hit - Draw debug sphere at the impact point
-    			DrawDebugSphere(GetWorld(), AccuracyAdjustedFireAt, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
-    		}
-    	}
-    }
 	TimeSinceLastShot = 0.0f;
-	RoundsRemainingInMagazine--;
 	return true;
 }
+
 
 void UWeaponComponent::Reload()
 {

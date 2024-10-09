@@ -23,6 +23,7 @@ public:
 	int32 MagazineSize = 5;
 	float ReloadTime = 1.0f;
 	bool IsExplosive = false;
+	bool IsShotgun = false;
 	float ExplosionRadius = 200.0f;
 
 	/**
@@ -36,7 +37,8 @@ public:
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
 		WeaponString += "Reload Time:   " + FString::SanitizeFloat(ReloadTime) + "\n";
-		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False");
+		WeaponString += "Is Explosive:  " + FString(IsExplosive ? "True" : "False") + "\n";
+		WeaponString += "Is Shotgun:    " + FString(IsShotgun ? "True" : "False");
 		return WeaponString;
 	}
 };

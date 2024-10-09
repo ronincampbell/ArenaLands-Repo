@@ -42,6 +42,8 @@ public:
 	bool bHasReloadTimeMod = false;
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	bool bIsExplosive = false;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	bool bIsShotgun = false;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FString ActiveMods = "Equipped Mods: \n";

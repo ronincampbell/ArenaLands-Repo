@@ -71,6 +71,12 @@ void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
 		bIsExplosive = true;
 		ActiveMods += "- Explosive Mod\n";
 	}
+
+	if (WeaponStats.IsShotgun)
+    {
+        bIsShotgun = true;
+        ActiveMods += "- Shotgun Mod\n";
+    }
 }
 
 void ABaseCharacter::Reload()
