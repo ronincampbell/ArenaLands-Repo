@@ -211,7 +211,7 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 		}
 
 		// Pop up until weapon is empty or a maximum duration has passed
-		if(CoverTimer > MaximumPopupDuration || (HasWeapon() && WeaponComponent->IsMagazineEmpty()))
+		if(CoverTimer > MinimumPopupDuration && (CoverTimer > MaximumPopupDuration || (HasWeapon() && WeaponComponent->IsMagazineEmpty())))
 		{
 			Crouch();
 			CoverTimer = 0.0f;

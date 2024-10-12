@@ -200,6 +200,9 @@ protected:
 	FVector CoverCheckOffset = FVector(0.0f,0.0f,15.0f);
 	// Function to recalculate bInCover based on current player position
 	void UpdateCover();
+	// Shortest time enemy can spend standing from cover to fire
+	UPROPERTY(EditAnywhere)
+	float MinimumPopupDuration = 0.5f;
 	// Longest time enemy can spend standing from cover to fire
 	UPROPERTY(EditAnywhere)
 	float MaximumPopupDuration = 1.5f;
