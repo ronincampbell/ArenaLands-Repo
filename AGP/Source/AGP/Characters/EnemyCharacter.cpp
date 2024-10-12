@@ -546,11 +546,21 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	
 	UpdateSight();
 	UpdateMorale();
-
+	
 	if(ScatterTimer > 0)
 	{
 		//This space intentionally left blank
 		//This condition just prevents the detection code from running and interrupting scattering
+	}
+	//Turn to look at player as long as they're spotted
+	//Should help with consistent spotting and also give visual feedback
+	if(SensedCharacter)
+	{
+		FVector DirectionToPlayer = SensedCharacter->GetActorLocation() - GetActorLocation();
+		FVector FlatDirection = DirectionToPlayer.GetSafeNormal2D();
+
+		FRotator FlatRotation = FlatDirection.Rotation();
+		SetActorRotation(FlatRotation);
 	}
 	//If player is spotted while idle
 	else if(SensedCharacter && !DetectedPlayer)
