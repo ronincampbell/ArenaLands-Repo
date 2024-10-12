@@ -1,5 +1,6 @@
 #include "WeaponComponent.h"
 #include "BaseCharacter.h"
+#include "EnemyCharacter.h"
 #include "HealthComponent.h"
 
 // Sets default values for this component's properties
@@ -79,6 +80,19 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 							}
 						}
 					}
+
+					// Second, larger sphere to simulate sound of explosion moving further than damage
+					FCollisionShape SoundSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius*ExplosionSoundRadiusMultiplier);
+					if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, SoundSphere, QueryParams))
+					{
+						for (auto& SoundHit : HitResults)
+						{
+							if (AEnemyCharacter* AffectedCharacter = Cast<AEnemyCharacter>(SoundHit.GetActor()))
+							{
+								AffectedCharacter->OnHearExplosion(HitResult.ImpactPoint);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -138,6 +152,19 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 							{
 								AffectedHealth->ApplyDamage(WeaponStats.BaseDamage);
 							}
+						}
+					}
+				}
+
+				// Second, larger sphere to simulate sound of explosion moving further than damage
+				FCollisionShape SoundSphere = FCollisionShape::MakeSphere(WeaponStats.ExplosionRadius*ExplosionSoundRadiusMultiplier);
+				if (GetWorld()->SweepMultiByChannel(HitResults, HitResult.ImpactPoint, HitResult.ImpactPoint, FQuat::Identity, ECC_WorldStatic, SoundSphere, QueryParams))
+				{
+					for (auto& SoundHit : HitResults)
+					{
+						if (AEnemyCharacter* AffectedCharacter = Cast<AEnemyCharacter>(SoundHit.GetActor()))
+						{
+							AffectedCharacter->OnHearExplosion(HitResult.ImpactPoint);
 						}
 					}
 				}

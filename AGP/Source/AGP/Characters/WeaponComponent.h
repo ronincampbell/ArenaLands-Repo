@@ -90,4 +90,5 @@ private:
 	 */
 	void CompleteReload();
 	float CurrentReloadDuration = 0.0f;
+	const float ExplosionSoundRadiusMultiplier = 2.0f;
 };
