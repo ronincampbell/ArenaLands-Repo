@@ -196,7 +196,10 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 	}
 	else
 	{
-		Fire(GetCurrOrLastPlayerPos());
+		if(IsSafeToFire(GetCurrOrLastPlayerPos()))
+		{
+			Fire(GetCurrOrLastPlayerPos());	
+		}
 		
 		if(CoverTimer > MaximumPopupDuration || (HasWeapon() && WeaponComponent->IsMagazineEmpty()))
 		{
@@ -215,7 +218,10 @@ void AEnemyCharacter::TickPush()
 	}
 
 	MoveAlongPath();
-	Fire(GetCurrOrLastPlayerPos());
+	if(IsSafeToFire(GetCurrOrLastPlayerPos()))
+	{
+		Fire(GetCurrOrLastPlayerPos());	
+	}
 }
 
 void AEnemyCharacter::TickScatter(float DeltaTime)
@@ -512,6 +518,24 @@ void AEnemyCharacter::ReassignSquadIDs()
 	{
 		EnterIdle();
 	}
+}
+
+//Returns whether it is safe to fire at the given location
+//Considers a shot unsafe if a perfectly accurate shot would hit a fellow enemy
+bool AEnemyCharacter::IsSafeToFire(const FVector& FireLocation) const
+{
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStartPosition->GetComponentLocation(), FireLocation, ECC_WorldStatic, QueryParams))
+	{
+		if (Cast<AEnemyCharacter>(HitResult.GetActor()))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 // Called every frame

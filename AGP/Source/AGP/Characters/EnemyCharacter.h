@@ -219,6 +219,7 @@ protected:
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
 	void AddSquadMate(AEnemyCharacter* NewSquadMate);
 	void ReassignSquadIDs();
+	bool IsSafeToFire(const FVector& FireLocation) const;
 
 public:	
 
