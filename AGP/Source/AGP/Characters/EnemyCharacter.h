@@ -213,10 +213,12 @@ protected:
 	void EnterCombat();
 	void EnterIdle();
 	bool IsInCombat() const;
+	bool IsIdle() const;
 	void ReceiveCallout(APlayerCharacter* SensedPlayer);
 	void SendCallouts();
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
 	void AddSquadMate(AEnemyCharacter* NewSquadMate);
+	void ReassignSquadIDs();
 
 public:	
 

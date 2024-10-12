@@ -38,7 +38,10 @@ void AEnemyCharacter::BeginPlay()
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSensedPawn);
 	}
 
-	int HighestExistingID = -1;
+	if(!HasTreasure())
+	{
+		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
+	}
 	//Making sure squads are fully interconnected
 	for(AEnemyCharacter* SquadMate : SquadMates)
 	{
@@ -46,24 +49,9 @@ void AEnemyCharacter::BeginPlay()
 		{
 			SquadMate->AddSquadMate(this);
 		}
-		if(SquadMate->SquadID > HighestExistingID)
-		{
-			HighestExistingID = SquadMate->SquadID;
-		}
 	}
 
-	SquadID = HighestExistingID + 1;
-	
-	if(HasTreasure())
-	{
-		FVector GuardDirection = FVector::ForwardVector.RotateAngleAxis(360/(SquadMates.Num()+1) * SquadID, FVector::UpVector);
-		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+GuardDirection*GuardRadius);
-	}
-	else
-	{
-		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
-	}
-	//CurrentPath.Add(GuardLocation);
+	ReassignSquadIDs();
 }
 
 void AEnemyCharacter::MoveAlongPath()
@@ -391,6 +379,11 @@ bool AEnemyCharacter::IsInCombat() const
 	return CurrentState == EEnemyState::Retreat || CurrentState == EEnemyState::Hold || CurrentState == EEnemyState::Push;
 }
 
+bool AEnemyCharacter::IsIdle() const
+{
+	return CurrentState == EEnemyState::Guard || CurrentState == EEnemyState::Patrol || CurrentState == EEnemyState::Wander;
+}
+
 void AEnemyCharacter::ReceiveCallout(APlayerCharacter* SensedPlayer)
 {
 	//UE_LOG(LogTemp, Display, TEXT("Received callout"))
@@ -486,6 +479,41 @@ void AEnemyCharacter::AddSquadMate(AEnemyCharacter* NewSquadMate)
 	}
 }
 
+void AEnemyCharacter::ReassignSquadIDs()
+{
+	int HighestExistingID = -1;
+	
+	for(AEnemyCharacter* SquadMate : SquadMates)
+	{
+		if(SquadMate->SquadID > HighestExistingID)
+		{
+			HighestExistingID = SquadMate->SquadID;
+		}
+	}
+
+	SquadID = HighestExistingID + 1;
+
+	if(SquadID%2 == 1)
+	{
+		PatrolDuty = true;
+	}
+	else
+	{
+		PatrolDuty = false;
+	}
+
+	if(HasTreasure())
+	{
+		FVector GuardDirection = FVector::ForwardVector.RotateAngleAxis(360/(SquadMates.Num()+1) * SquadID, FVector::UpVector);
+		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+GuardDirection*GuardRadius);
+	}
+
+	if(IsIdle())
+	{
+		EnterIdle();
+	}
+}
+
 // Called every frame
 void AEnemyCharacter::Tick(float DeltaTime)
 {
@@ -497,6 +525,11 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		for(AEnemyCharacter* SquadMate : SquadMates)
 		{
 			SquadMate->SquadMates.Remove(this);
+			SquadMate->SquadID = -1;
+		}
+		for(AEnemyCharacter* SquadMate : SquadMates)
+		{
+			SquadMate->ReassignSquadIDs();
 		}
 
 		Destroy();
