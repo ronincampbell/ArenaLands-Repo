@@ -36,6 +36,8 @@ protected:
 	USceneComponent* LocationComponent;
 	UPROPERTY(EditAnywhere)
 	bool bAutoTwoWayConnect = true;
+	UPROPERTY(EditAnywhere)
+	bool bDrawDebug = true;
 
 public:	
 	// Called every frame

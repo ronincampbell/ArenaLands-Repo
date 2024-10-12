@@ -38,6 +38,10 @@ void ANavigationNode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(!bDrawDebug)
+	{
+		return;
+	}
 	FColor SphereColor = FColor::Blue;
 	if (ConnectedNodes.Contains(this))
 	{
