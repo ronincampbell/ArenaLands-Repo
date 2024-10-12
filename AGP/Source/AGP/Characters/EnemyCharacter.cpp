@@ -42,7 +42,7 @@ void AEnemyCharacter::BeginPlay()
 	{
 		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
 	}
-	//Making sure squads are fully interconnected
+	// Making sure squads are fully interconnected
 	for(AEnemyCharacter* SquadMate : SquadMates)
 	{
 		if(!SquadMate->SquadMates.Contains(this))
@@ -76,13 +76,13 @@ void AEnemyCharacter::MoveAlongPath()
 
 void AEnemyCharacter::TickGuard()
 {
-	//Potentially could distribute look direction with other guarding squad mates
 	if(CurrentPath.IsEmpty())
 	{
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GuardLocation);
 
 		if(HasTreasure())
 		{
+			// Look away from treasure, to maximise area watched that player could approach from
 			FVector DirectionFromTreasure = GetActorLocation() - Treasure->GetActorLocation();
 			FVector FlatDirection = DirectionFromTreasure.GetSafeNormal2D();
 
@@ -96,15 +96,16 @@ void AEnemyCharacter::TickGuard()
 
 void AEnemyCharacter::TickPatrol()
 {
-	//Potentially could distribute patrol paths with other patrolling squad mates
-
 	if(CurrentPath.IsEmpty())
 	{
+		// This state doesn't make sense if the enemy has no treasure, so leave if that's the case
 		if(!HasTreasure())
 		{
 			EnterIdle();
 			return;
 		}
+		// Perimeter is broken up into n chunks (for n SquadMates)
+		// Pick patrol locations within the chunk corresponding with SquadID
 		float StartAngle = 360/(SquadMates.Num()+1) * SquadID;
 		float RandAngle = FMath::FRandRange(StartAngle, StartAngle + 360/(SquadMates.Num()+1));
 		const FVector PatrolDirection = FVector::ForwardVector.RotateAngleAxis(RandAngle, FVector::UpVector);
@@ -133,6 +134,7 @@ void AEnemyCharacter::TickInvestigate(float DeltaTime)
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), LastSeenPlayerLocation);
 	}
 
+	//Don't start timeout timer until close enough to location being investigated
 	if(FVector::Distance(GetActorLocation(), LastSeenPlayerLocation) <= InvestigateError)
 	{
 		InvestigateTimer += DeltaTime;
@@ -148,6 +150,8 @@ void AEnemyCharacter::TickInvestigate(float DeltaTime)
 
 void AEnemyCharacter::TickRetreat()
 {
+	// Naively run away from player
+	// This is acceptable, as the enemy is meant to be panicking, so complex pathfinding would look too controlled
 	if(CurrentPath.IsEmpty())
 	{
 		FVector RetreatDirection = GetActorLocation() - GetCurrOrLastPlayerPos();
@@ -163,8 +167,10 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 	UpdateCover();
 	if(CurrentPath.IsEmpty())
 	{
+		// Move towards cover if not behind some
 		if(!bInCover)
 		{
+			// Try to stay close to Treasure if it's secure
 			if(HasTreasure())
 			{
 				CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearestCoverLocation(Treasure->GetActorLocation()));
@@ -177,17 +183,19 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 	}
 
 	MoveAlongPath();
-	
+
+	// Don't crouch if not in cover, as this just slows the enemy down while they're easy to hit
 	if(!bInCover)
 	{
 		UnCrouch();
-		UE_LOG(LogTemp, Display, TEXT("Early Return"))
+		//UE_LOG(LogTemp, Display, TEXT("Early Return"))
 		return;
 	}
 
 	CoverTimer += DeltaTime;
 	if(bIsCrouched)
 	{
+		// Hide for a minimum duration then pop up only if the weapon has ammo
 		if(CoverTimer > MinimumHideDuration && (!HasWeapon() || !WeaponComponent->IsMagazineEmpty()))
 		{
 			UnCrouch();
@@ -196,11 +204,13 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 	}
 	else
 	{
+		// Firing only when standing
 		if(IsSafeToFire(GetCurrOrLastPlayerPos()))
 		{
 			Fire(GetCurrOrLastPlayerPos());	
 		}
-		
+
+		// Pop up until weapon is empty or a maximum duration has passed
 		if(CoverTimer > MaximumPopupDuration || (HasWeapon() && WeaponComponent->IsMagazineEmpty()))
 		{
 			Crouch();
@@ -212,6 +222,8 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 
 void AEnemyCharacter::TickPush()
 {
+	// Naively moving towards player for now
+	// TODO: Implement enemies trying to flank player
 	if(CurrentPath.IsEmpty())
 	{
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GetCurrOrLastPlayerPos());
@@ -237,6 +249,7 @@ void AEnemyCharacter::TickScatter(float DeltaTime)
 	if(ScatterTimer <= 0.0f)
 	{
 		ScatterTimer = 0.0f;
+		// Return to non-scatter state
 		if(DetectedPlayer)
 		{
 			EnterCombat();
@@ -254,6 +267,7 @@ void AEnemyCharacter::OnSensedPawn(APawn* SensedActor)
 {
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(SensedActor))
 	{
+		// Ignore the player if they're a spectator
 		if(!Player->IsSpectator()){
 			SensedCharacter = Player;
 		}
@@ -264,6 +278,7 @@ void AEnemyCharacter::OnHearExplosion(const FVector& ExplosionLocation)
 {
 	LastExplosiveLocation = ExplosionLocation;
 	ScatterTimer = ScatterTimeout;
+	// Start scattering away from the explosion
 	CurrentPath.Empty();
 	CurrentState = EEnemyState::Scatter;
 }
@@ -275,6 +290,7 @@ void AEnemyCharacter::UpdateSight()
 	{
 		if (!PawnSensingComponent->HasLineOfSightTo(SensedCharacter))
 		{
+			// Update the last place the player was seen just as the enemy loses sight of them
 			LastSeenPlayerLocation = PathfindingSubsystem->FindNearestNodePos(SensedCharacter->GetActorLocation());
 			LastSeenPlayerHealth = SensedCharacter->HealthComponent->GetCurrentHealthPercentage();
 			SensedCharacter = nullptr;
@@ -349,7 +365,8 @@ void AEnemyCharacter::EnterCombat()
 	{
 		DesiredState = EEnemyState::Push;
 	}
-	
+
+	// Only clear the path if the state changed
 	if(DesiredState != CurrentState)
 	{
 		CurrentPath.Empty();
@@ -372,7 +389,8 @@ void AEnemyCharacter::EnterIdle()
 	{
 		DesiredState = EEnemyState::Guard;
 	}
-	
+
+	// Only clear the path if the state changed
 	if(DesiredState != CurrentState)
 	{
 		CurrentPath.Empty();
@@ -420,6 +438,7 @@ FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) 
 	for(FVector NodePos : PathfindingSubsystem->GetWaypointPositions())
 	{
 		float NodeDistance = FVector::Distance(StartLocation, NodePos);
+		// Ignore nodes that are too far away
 		if(NodeDistance > CoverCheckDistance)
 		{
 			continue;
@@ -431,6 +450,7 @@ FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) 
 		FHitResult HitResult;
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(this);
+		// Ignore squadmates, so that enemies don't try to hide behind each other
 		for(AEnemyCharacter* SquadMate : SquadMates)
 		{
 			QueryParams.AddIgnoredActor(SquadMate);
@@ -461,10 +481,9 @@ FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) 
 	{
 		return StartLocation;		
 	}
-	else
-	{
-		return NearestPos;
-	}
+
+	return NearestPos;
+	
 }
 
 void AEnemyCharacter::AddSquadMate(AEnemyCharacter* NewSquadMate)
@@ -514,6 +533,7 @@ void AEnemyCharacter::ReassignSquadID()
 		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+GuardDirection*GuardRadius);
 	}
 
+	// Used so that the enemy will change state between Guard and Patrol if their duty changed
 	if(IsIdle())
 	{
 		EnterIdle();

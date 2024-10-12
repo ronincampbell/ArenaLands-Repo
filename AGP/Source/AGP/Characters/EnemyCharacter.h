@@ -243,7 +243,10 @@ protected:
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
 	// Adds another enemy to this enemy's SquadMates array, along with the SquadMates of the other enemy
 	void AddSquadMate(AEnemyCharacter* NewSquadMate);
-	// Reassigns the squad ID of this enemy. Used after a SquadMate has died.
+	/**
+	 * Reassigns the squad ID of this enemy. Used after a SquadMate has died.
+	 * Also updates patrol duty and guard positions to redistribute load across squad
+	 */
 	void ReassignSquadID();
 	/**
 	 * Determines whether it is safe to fire at FireLocation
