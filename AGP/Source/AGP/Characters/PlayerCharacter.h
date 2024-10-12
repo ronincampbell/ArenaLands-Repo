@@ -21,6 +21,7 @@ class AGP_API APlayerCharacter : public ABaseCharacter
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
+	UFUNCTION(BlueprintCallable)
 	bool IsSpectator();
 
 protected:
