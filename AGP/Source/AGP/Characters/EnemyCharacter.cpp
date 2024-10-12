@@ -38,6 +38,7 @@ void AEnemyCharacter::BeginPlay()
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSensedPawn);
 	}
 
+	int HighestExistingID = -1;
 	//Making sure squads are fully interconnected
 	for(AEnemyCharacter* SquadMate : SquadMates)
 	{
@@ -45,11 +46,18 @@ void AEnemyCharacter::BeginPlay()
 		{
 			SquadMate->AddSquadMate(this);
 		}
+		if(SquadMate->SquadID > HighestExistingID)
+		{
+			HighestExistingID = SquadMate->SquadID;
+		}
 	}
 
+	SquadID = HighestExistingID + 1;
+	
 	if(HasTreasure())
 	{
-		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+FMath::VRand().GetSafeNormal2D()*GuardRadius);
+		FVector GuardDirection = FVector::ForwardVector.RotateAngleAxis(360/(SquadMates.Num()+1) * SquadID, FVector::UpVector);
+		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+GuardDirection*GuardRadius);
 	}
 	else
 	{

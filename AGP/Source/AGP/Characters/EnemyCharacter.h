@@ -147,6 +147,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<AEnemyCharacter*> SquadMates;
+	UPROPERTY(VisibleAnywhere)
+	int SquadID = -1;
 
 	//Value used to measure enemy's confidence in combat and control behaviours
 	UPROPERTY(VisibleAnywhere)
