@@ -38,6 +38,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* ReloadAction;
 	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SpectatorAction;
+	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* InputMappingContext;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -57,5 +59,6 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void FireWeapon(const FInputActionValue& Value);
+	void ToggleSpectator(const FInputActionValue& Value);
 
 };

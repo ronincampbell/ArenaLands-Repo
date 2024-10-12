@@ -53,6 +53,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		Input->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::FireWeapon);
 		Input->BindAction(ReloadAction, ETriggerEvent::Started, this, &ABaseCharacter::Reload);
+		Input->BindAction(SpectatorAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleSpectator);
 	}
 }
 
@@ -82,5 +83,10 @@ void APlayerCharacter::FireWeapon(const FInputActionValue& Value)
 	{
 		Fire(BulletStartPosition->GetComponentLocation() + 10000.0f * CameraForward);
 	}
+}
+
+void APlayerCharacter::ToggleSpectator(const FInputActionValue& Value)
+{
+	bIsSpectator = !bIsSpectator;
 }
 
