@@ -117,8 +117,11 @@ void AEnemyCharacter::TickPatrol()
 			EnterIdle();
 			return;
 		}
-		const FVector RandOffset = FMath::VRand().GetSafeNormal2D()*TerritoryRadius;
-		const FVector PatrolLocation = Treasure->GetActorLocation() + RandOffset;
+		float StartAngle = 360/(SquadMates.Num()+1) * SquadID;
+		float RandAngle = FMath::FRandRange(StartAngle, StartAngle + 360/(SquadMates.Num()+1));
+		const FVector PatrolDirection = FVector::ForwardVector.RotateAngleAxis(RandAngle, FVector::UpVector);
+
+		const FVector PatrolLocation = Treasure->GetActorLocation() + PatrolDirection*TerritoryRadius;
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), PatrolLocation);
 	}
 
