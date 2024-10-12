@@ -45,8 +45,19 @@ public:
 	 */
 	TArray<FVector> GetPathAway(const FVector& StartLocation, const FVector& TargetLocation);
 
+	/**
+	 * Will retrieve the position of the best neighbour node to move to in order to move in the TargetDirection 
+	 * @param StartLocation The location the search starts from (will look for nearest node to determine neighbours)
+	 * @param TargetDirection The direction that will be used to determine closeness of matches
+	 * @return The position of the node whose direction from the start node most closely matches TargetDirection
+	 */
 	FVector GetPosInDirection(const FVector& StartLocation, const FVector& TargetDirection);
 
+	/**
+	 * Will retrieve the position of the node closest to TargetLocation
+	 * @param TargetLocation The location to search from
+	 * @return The postion of the node that is closest to TargetLocation
+	 */
 	FVector FindNearestNodePos(const FVector& TargetLocation);
 
 	// Procedural Map Logic

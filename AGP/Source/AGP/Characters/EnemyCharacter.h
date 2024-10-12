@@ -43,6 +43,9 @@ public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
 
+	// To be called when an explosion goes off close to the enemy
+	void OnHearExplosion(const FVector& ExplosionLocation);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -77,7 +80,6 @@ protected:
 	UFUNCTION()
 	void OnSensedPawn(APawn* SensedActor);
 	
-	void OnHearExplosion(const FVector& ExplosionLocation);
 	/**
 	 * Will update the SensedCharacter variable based on whether the UPawnSensingComponent has a line of sight to the
 	 * Player Character or not. This may cause the SensedCharacter variable to become a nullptr so be careful when using
@@ -103,7 +105,6 @@ protected:
 	 */
 	UPROPERTY()
 	APlayerCharacter* SensedCharacter = nullptr;
-	//TODO: Add SensedExplosive variable once the explosives have been implemented
 
 	/**
 	 * An array of vectors representing the current path that the agent is traversing along.
@@ -123,102 +124,133 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere)
 	float PathfindingError = 150.0f; // 150 cm from target by default.
-	
+
+	// The delay, in seconds, before the enemy fully detects the player if sight line isn't broken
 	UPROPERTY(EditAnywhere)
 	float DetectionDelay = 1.0f;
+	// The delay, in seconds, before the enemy returns to idle states after losing sight of player during combat
 	UPROPERTY(EditAnywhere)
 	float ReturnToIdleDelay = 5.0f;
 	float DetectionTimer = 0.0f;
+	// Whether the enemy has fully detected the player
 	bool DetectedPlayer = false;
-	
+
+	// The time, in seconds, that the enemy will wait at the last location they saw the player before returning to idle states
 	UPROPERTY(EditAnywhere)
 	float InvestigateTimeout = 6.0f;
 	float InvestigateTimer = 0.0f;
+	// How close the enemy has to be to the node they're investigating before the InvestigateTimer starts
 	UPROPERTY(EditAnywhere)
 	float InvestigateError = 100.0f;
-	
+
+	// How long, in seconds, the enemy will scatter for before returning to combat
 	UPROPERTY(EditAnywhere)
 	float ScatterTimeout = 2.0f;
 	float ScatterTimer = 0.0f;
-	
+
+	// The last place the enemy saw the player, so the enemy doesn't lose track of the player as soon as they go around a corner
 	FVector LastSeenPlayerLocation {};
+	// The last place the enemy heard an explosion from, used to scatter away from the location
 	FVector LastExplosiveLocation {};
 	float LastSeenPlayerHealth = 1.0f;
 
+	// The list of other enemies in this enemy's Squad, used for callouts and organisation
 	UPROPERTY(EditAnywhere)
 	TArray<AEnemyCharacter*> SquadMates;
+	// The enemy's ID within their squad, used to determine positioning when guarding and patrolling
 	UPROPERTY(VisibleAnywhere)
 	int SquadID = -1;
 
-	//Value used to measure enemy's confidence in combat and control behaviours
+	// Value used to measure enemy's confidence in combat and control behaviours
 	UPROPERTY(VisibleAnywhere)
 	float CurrentMorale = 0.0f;
-	//Value added based on own health ratio
+	// Value added to morale based on own health ratio
 	UPROPERTY(EditAnywhere)
 	float HealthMoraleContribution = 3.0f; 
-	//Value added to morale per squad mate
+	// Value added to morale per squad mate
 	UPROPERTY(EditAnywhere)
 	float SquadMateMoraleContribution = 1.5f; 
-	//Value subtracted based on player health ratio
+	// Value subtracted from morale based on player health ratio
 	UPROPERTY(EditAnywhere)
-	float PlayerHealthMoraleContribution = 2.0f; 
+	float PlayerHealthMoraleContribution = 2.0f;
+	// Function to recalculate CurrentMorale based on contributing factors
 	void UpdateMorale();
-	//Below this value, the enemy retreats during combat
+	// Below this morale value, the enemy retreats during combat
 	UPROPERTY(EditAnywhere)
 	float MoraleRetreatCutoff = 1.0f; 
-	//Above this value, the enemy pushes forward during combat
+	// Above this morale value, the enemy pushes forward during combat
 	UPROPERTY(EditAnywhere)
 	float MoralePushCutoff = 3.0f; 
 
-	//Determines whether enemy uses Guard or Patrol state when idle
+	// Determines whether enemy uses Guard or Patrol state when idle
 	UPROPERTY(EditAnywhere)
-	bool PatrolDuty = false; 
+	bool PatrolDuty = false;
+	// Whether the enemy considers itself to be in cover (relative to the player)
 	UPROPERTY()
-	bool InCover = false;
+	bool bInCover = false;
+	// How far away from their treasure the enemy should consider when looking for cover
 	UPROPERTY(EditAnywhere)
 	float CoverCheckDistance = 200.0f;
+	// The offset from the center of the enemy to their feet
 	FVector FootOffset = FVector(0.0f, 0.0f, -88.0f);
+	// The offset from the player's position to their head
 	FVector PlayerHeadOffset = FVector(0.0f, 0.0f, 60.0f);
+	// The offset from the ground to the point used when checking for cover
 	UPROPERTY(EditAnywhere)
 	FVector CoverCheckOffset = FVector(0.0f,0.0f,15.0f);
+	// Function to recalculate bInCover based on current player position
 	void UpdateCover();
-	//Longest time enemy can spend standing from cover to fire
+	// Longest time enemy can spend standing from cover to fire
 	UPROPERTY(EditAnywhere)
 	float MaximumPopupDuration = 1.5f;
-	//Shortest time enemy can spend crouching behind cover
+	// Shortest time enemy can spend crouching behind cover
 	UPROPERTY(EditAnywhere)
 	float MinimumHideDuration = 2.0f;
 	float CoverTimer = 0.0f;
 
-	//Treasure that enemy is trying to protect, defines center of territory
+	// Treasure that enemy is trying to protect, defines center of territory
 	UPROPERTY(EditAnywhere)
 	ATreasurePickup* Treasure = nullptr;
 	bool HasTreasure();
-	//Radius around Treasure to patrol and hold position within
+	// Radius around Treasure to patrol
 	UPROPERTY(EditAnywhere)
 	float TerritoryRadius = 400.0f; 
 
+	// Position enemy will move to when in guard state
 	UPROPERTY()
 	FVector GuardLocation {};
-	//How far enemy can be from their guard position during guard state
-	UPROPERTY(EditAnywhere)
-	float GuardError = 100.0f;
-	//Distance from the treasure to select guard positions from
+	// Distance from the treasure to select guard positions from
 	UPROPERTY(EditAnywhere)
 	float GuardRadius = 100.0f;
 
+	// Debug option, makes enemy print their CurrentState to the Output Log
 	UPROPERTY(EditAnywhere)
 	bool bPrintState = false;
 
+	// Moves the enemy into one of the combat states, based on their current morale
 	void EnterCombat();
+	// Moves the enemy into one of the idle states, based on if their treasure is secure and what their duty is
 	void EnterIdle();
+	// Whether the enemy is in a combat state (ie. Push, Hold or Retreat)
 	bool IsInCombat() const;
+	// Whether the enemy is in an idle state (ie. Guard, Patrol or Wander)
 	bool IsIdle() const;
+	// Function called by SendCallouts() to send information about detected player
 	void ReceiveCallout(APlayerCharacter* SensedPlayer);
+	// Sends information about detected player to SquadMates
 	void SendCallouts();
+	// Finds the nearest node to StartLocation that is considered cover
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
+	// Adds another enemy to this enemy's SquadMates array, along with the SquadMates of the other enemy
 	void AddSquadMate(AEnemyCharacter* NewSquadMate);
-	void ReassignSquadIDs();
+	// Reassigns the squad ID of this enemy. Used after a SquadMate has died.
+	void ReassignSquadID();
+	/**
+	 * Determines whether it is safe to fire at FireLocation
+	 * A shot is unsafe if a perfectly accurate shot towards the location would hit another enemy
+	 * @param FireLocation The location to fire at
+	 * @return Whether it is safe to fire at FireLocation
+	 */
 	bool IsSafeToFire(const FVector& FireLocation) const;
 
 public:	
@@ -234,6 +266,7 @@ private:
 	 */
 	APlayerCharacter* FindPlayer() const;
 
+	// Gets the current position of the player or, if the player isn't within sight, the last position they were seen at
 	FVector GetCurrOrLastPlayerPos() const;
 
 };

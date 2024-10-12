@@ -51,7 +51,7 @@ void AEnemyCharacter::BeginPlay()
 		}
 	}
 
-	ReassignSquadIDs();
+	ReassignSquadID();
 }
 
 void AEnemyCharacter::MoveAlongPath()
@@ -163,7 +163,7 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 	UpdateCover();
 	if(CurrentPath.IsEmpty())
 	{
-		if(!InCover)
+		if(!bInCover)
 		{
 			if(HasTreasure())
 			{
@@ -178,7 +178,7 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 
 	MoveAlongPath();
 	
-	if(!InCover)
+	if(!bInCover)
 	{
 		UnCrouch();
 		UE_LOG(LogTemp, Display, TEXT("Early Return"))
@@ -321,12 +321,12 @@ void AEnemyCharacter::UpdateCover()
 		//ie. Cover intercepted the line
 		if (!Cast<APlayerCharacter>(HitResult.GetActor()))
 		{
-			InCover = true;
+			bInCover = true;
 			return;
 		}
 	}
 
-	InCover = false;
+	bInCover = false;
 }
 
 bool AEnemyCharacter::HasTreasure()
@@ -485,7 +485,7 @@ void AEnemyCharacter::AddSquadMate(AEnemyCharacter* NewSquadMate)
 	}
 }
 
-void AEnemyCharacter::ReassignSquadIDs()
+void AEnemyCharacter::ReassignSquadID()
 {
 	int HighestExistingID = -1;
 	
@@ -520,8 +520,6 @@ void AEnemyCharacter::ReassignSquadIDs()
 	}
 }
 
-//Returns whether it is safe to fire at the given location
-//Considers a shot unsafe if a perfectly accurate shot would hit a fellow enemy
 bool AEnemyCharacter::IsSafeToFire(const FVector& FireLocation) const
 {
 	FHitResult HitResult;
@@ -553,7 +551,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		}
 		for(AEnemyCharacter* SquadMate : SquadMates)
 		{
-			SquadMate->ReassignSquadIDs();
+			SquadMate->ReassignSquadID();
 		}
 
 		Destroy();
@@ -623,12 +621,17 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 	//Turn to look at player as long as they're spotted
 	//Should help with consistent spotting and also give visual feedback
-	if(SensedCharacter)
+	if(SensedCharacter && ScatterTimer <= 0)
 	{
 		FVector DirectionToPlayer = SensedCharacter->GetActorLocation() - GetActorLocation();
 		FVector FlatDirection = DirectionToPlayer.GetSafeNormal2D();
+		if(CurrentState == EEnemyState::Retreat)
+		{
+			FlatDirection *= -1;
+		}
 
 		FRotator FlatRotation = FlatDirection.Rotation();
+		
 		SetActorRotation(FlatRotation);
 	}
 
