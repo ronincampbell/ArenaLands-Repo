@@ -47,6 +47,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FString ActiveMods = "Equipped Mods: \n";
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 
 protected:
@@ -71,7 +73,7 @@ protected:
 	/**
 	 * An actor component that controls the logic for this characters equipped weapon.
 	 */
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	UWeaponComponent* WeaponComponent = nullptr;
 
 	/**
@@ -80,10 +82,16 @@ protected:
 	 * @param FireAtLocation The location that you want to fire at.
 	 * @return true if a shot was taken and false otherwise.
 	 */
-	bool Fire(const FVector& FireAtLocation);
+	void Fire(const FVector& FireAtLocation);
 
 	// Updates modification bools based on weapon stats
 	void UpdateModBools(const FWeaponStats& WeaponStats);
+
+private:
+	void EquipWeaponImplementation(bool bEquipWeapon, const FWeaponStats& WeaponStats = FWeaponStats());
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastEquipWeapon(bool bEquipWeapon);
 
 public:	
 	// Called every frame

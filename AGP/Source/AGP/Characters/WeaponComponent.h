@@ -52,7 +52,7 @@ public:
 	// Sets default values for this component's properties
 	UWeaponComponent();
 
-	bool Fire(const FVector& BulletStart, const FVector& FireAtLocation);
+	void Fire(const FVector& BulletStart, const FVector& FireAtLocation);
 	/**
 	 * Starts the process of reloading.
 	 */
@@ -91,4 +91,14 @@ private:
 	void CompleteReload();
 	float CurrentReloadDuration = 0.0f;
 	const float ExplosionSoundRadiusMultiplier = 2.0f;
+
+	bool FireImplementation(const FVector& BulletStart, const FVector& FireAtLocation, FVector& OutHitLocation);
+
+	void FireVisualImplementation(const FVector& BulletStart, const FVector& HitLocation);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastFire(const FVector& BulletStart, const FVector& HitLocation);
+
+	UFUNCTION(Server, Reliable)
+	void ServerFire(const FVector& BulletStart, const FVector& FireAtLocation);
 };

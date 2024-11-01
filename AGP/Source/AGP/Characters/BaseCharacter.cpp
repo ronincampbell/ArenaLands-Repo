@@ -3,6 +3,7 @@
 
 #include "BaseCharacter.h"
 #include "HealthComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -15,6 +16,13 @@ ABaseCharacter::ABaseCharacter()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
 }
 
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABaseCharacter, WeaponComponent);
+}
+
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {
@@ -22,13 +30,12 @@ void ABaseCharacter::BeginPlay()
 	
 }
 
-bool ABaseCharacter::Fire(const FVector& FireAtLocation)
+void ABaseCharacter::Fire(const FVector& FireAtLocation)
 {
 	if (HasWeapon())
 	{
-		return WeaponComponent->Fire(BulletStartPosition->GetComponentLocation(), FireAtLocation);
+		WeaponComponent->Fire(BulletStartPosition->GetComponentLocation(), FireAtLocation);
 	}
-	return false;
 }
 
 void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
@@ -80,26 +87,7 @@ void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
     }
 }
 
-void ABaseCharacter::Reload()
-{
-	if (HasWeapon())
-	{
-		WeaponComponent->Reload();
-	}
-}
-
-// Called every frame
-void ABaseCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-bool ABaseCharacter::HasWeapon()
-{
-	return (WeaponComponent != nullptr);
-}
-
-void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponStats)
+void ABaseCharacter::EquipWeaponImplementation(bool bEquipWeapon, const FWeaponStats& WeaponStats)
 {
 	// Create or remove the weapon component depending on whether we are trying to equip a weapon and we
 	// don't already have one. Or if we are trying to unequip a weapon and we do have one.
@@ -131,6 +119,39 @@ void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponSt
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("Player has unequipped weapon."))
+	}
+}
+
+void ABaseCharacter::MulticastEquipWeapon_Implementation(bool bEquipWeapon)
+{
+	EquipWeaponGraphical(bEquipWeapon);
+}
+
+void ABaseCharacter::Reload()
+{
+	if (HasWeapon())
+	{
+		WeaponComponent->Reload();
+	}
+}
+
+// Called every frame
+void ABaseCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+bool ABaseCharacter::HasWeapon()
+{
+	return (WeaponComponent != nullptr);
+}
+
+void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponStats)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		EquipWeaponImplementation(bEquipWeapon, WeaponStats);
+		MulticastEquipWeapon(bEquipWeapon);
 	}
 }
 

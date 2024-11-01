@@ -7,11 +7,46 @@
 UWeaponComponent::UWeaponComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
-bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLocation)
+void UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLocation)
 {
-	// Check if we can fire
+	FVector OutHit;
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		if(FireImplementation(BulletStart, FireAtLocation, OutHit))
+		{
+			MulticastFire(BulletStart, OutHit);
+		}
+	}
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		ServerFire(BulletStart, FireAtLocation);
+	}
+}
+
+
+void UWeaponComponent::Reload()
+{
+	// Shouldn't be able to reload if you are already reloading.
+	if (bIsReloading) return;
+	
+	UE_LOG(LogTemp, Display, TEXT("Start Reload"))
+	bIsReloading = true;
+	UIBIsReloading = true;
+}
+
+void UWeaponComponent::CompleteReload()
+{
+	UE_LOG(LogTemp, Display, TEXT("Reload Complete"))
+	RoundsRemainingInMagazine = WeaponStats.MagazineSize;
+}
+
+bool UWeaponComponent::FireImplementation(const FVector& BulletStart, const FVector& FireAtLocation,
+	FVector& OutHitLocation)
+{
+		// Check if we can fire
 	if (TimeSinceLastShot < WeaponStats.FireRate || IsMagazineEmpty())
 	{
 		return false;
@@ -41,6 +76,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 				// Standard Shotgun Projectile Logic
 				if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 				{
+					OutHitLocation = HitResult.ImpactPoint;
 					if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
 					{
 						if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
@@ -53,6 +89,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 				else
 				{
 					DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+					OutHitLocation = AccuracyAdjustedFireAt;
 				}
 			}
 			else
@@ -60,6 +97,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 				// Shotgun with Explosive logic
 				if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 				{
+					OutHitLocation = HitResult.ImpactPoint;
 					// Explosive hit something
 					DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
 
@@ -94,6 +132,11 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 						}
 					}
 				}
+				else
+				{
+					DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+					OutHitLocation = AccuracyAdjustedFireAt;
+				}
 			}
 		}
 
@@ -118,6 +161,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 			// Standard weapon logic
 			if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 			{
+				OutHitLocation = HitResult.ImpactPoint;
 				if (ABaseCharacter* HitCharacter = Cast<ABaseCharacter>(HitResult.GetActor()))
 				{
 					if (UHealthComponent* HitCharacterHealth = HitCharacter->GetComponentByClass<UHealthComponent>())
@@ -130,6 +174,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 			else
 			{
 				DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+				OutHitLocation = AccuracyAdjustedFireAt;
 			}
 		}
 		else
@@ -137,6 +182,7 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 			// Explosive weapon logic
 			if (GetWorld()->LineTraceSingleByChannel(HitResult, BulletStart, AccuracyAdjustedFireAt, ECC_WorldStatic, QueryParams))
 			{
+				OutHitLocation = HitResult.ImpactPoint;
 				DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, WeaponStats.ExplosionRadius, 12, FColor::Red, false, 1.0f);
 
 				TArray<FHitResult> HitResults;
@@ -169,6 +215,11 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 					}
 				}
 			}
+			else
+			{
+				DrawDebugLine(GetWorld(), BulletStart, AccuracyAdjustedFireAt, FColor::Red, false, 1.0f);
+				OutHitLocation = AccuracyAdjustedFireAt;
+			}
 		}
 		RoundsRemainingInMagazine--;
 	}
@@ -177,21 +228,23 @@ bool UWeaponComponent::Fire(const FVector& BulletStart, const FVector& FireAtLoc
 	return true;
 }
 
-
-void UWeaponComponent::Reload()
+void UWeaponComponent::FireVisualImplementation(const FVector& BulletStart, const FVector& HitLocation)
 {
-	// Shouldn't be able to reload if you are already reloading.
-	if (bIsReloading) return;
-	
-	UE_LOG(LogTemp, Display, TEXT("Start Reload"))
-	bIsReloading = true;
-	UIBIsReloading = true;
+	DrawDebugLine(GetWorld(), BulletStart, HitLocation, FColor::Blue, false, 1.0f);
 }
 
-void UWeaponComponent::CompleteReload()
+void UWeaponComponent::ServerFire_Implementation(const FVector& BulletStart, const FVector& FireAtLocation)
 {
-	UE_LOG(LogTemp, Display, TEXT("Reload Complete"))
-	RoundsRemainingInMagazine = WeaponStats.MagazineSize;
+	FVector OutHit;
+	if (FireImplementation(BulletStart, FireAtLocation, OutHit))
+	{
+		MulticastFire(BulletStart, OutHit);
+	}
+}
+
+void UWeaponComponent::MulticastFire_Implementation(const FVector& BulletStart, const FVector& HitLocation)
+{
+	FireVisualImplementation(BulletStart, HitLocation);
 }
 
 void UWeaponComponent::SetWeaponStats(const FWeaponStats& WeaponInfo)
