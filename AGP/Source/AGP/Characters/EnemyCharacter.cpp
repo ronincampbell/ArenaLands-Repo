@@ -294,7 +294,7 @@ void AEnemyCharacter::UpdateSight()
 			LastSeenPlayerLocation = PathfindingSubsystem->FindNearestNodePos(SensedCharacter->GetActorLocation());
 			LastSeenPlayerHealth = SensedCharacter->HealthComponent->GetCurrentHealthPercentage();
 			SensedCharacter = nullptr;
-			//UE_LOG(LogTemp, Display, TEXT("Lost Player"))
+			UE_LOG(LogTemp, Display, TEXT("Lost Player"))
 		}
 	}
 }
@@ -612,6 +612,12 @@ void AEnemyCharacter::Tick(float DeltaTime)
 			}
 			EnterCombat();
 		}
+	}
+	//Reset timer if enemy can see player
+	//Avoids losing detection over time when ducking behind cover
+	else if(SensedCharacter && DetectedPlayer)
+	{
+		DetectionTimer = ReturnToIdleDelay;
 	}
 	//If sight line is lost
 	else if(!SensedCharacter)
