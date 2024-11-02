@@ -5,7 +5,20 @@
 
 #include "AGPGameInstance.h"
 
-int UEnemySquadSubsystem::CreateSquad(ATreasurePickup* Treasure, int NumEnemies, float SquadSpawnRadius)
+void UEnemySquadSubsystem::RegisterTreasure(int SquadIndex, ATreasurePickup* Treasure)
+{
+	Treasures.Add(SquadIndex, Treasure);
+
+	if(Squads.Contains(SquadIndex))
+	{
+		for(AEnemyCharacter* Enemy : Squads[SquadIndex])
+		{
+			Enemy->bHasTreasure = true;
+		}
+	}
+}
+
+/*int UEnemySquadSubsystem::CreateSquad(ATreasurePickup* Treasure, int NumEnemies, float SquadSpawnRadius)
 {
 	if (const UAGPGameInstance* GameInstance =
 		GetWorld()->GetGameInstance<UAGPGameInstance>())
@@ -32,6 +45,27 @@ int UEnemySquadSubsystem::CreateSquad(ATreasurePickup* Treasure, int NumEnemies,
 		return SquadIndex;
 	}
 	return -1;
+}*/
+
+int UEnemySquadSubsystem::RegisterSquadMember(int SquadIndex, AEnemyCharacter* SquadMember)
+{
+	if(Treasures.Contains(SquadIndex))
+	{
+		SquadMember->bHasTreasure = true;
+	}
+	else
+	{
+		SquadMember->bHasTreasure = false;
+	}
+	if(!Squads.Contains(SquadIndex))
+	{
+		Squads.Add(SquadIndex, TArray<AEnemyCharacter*> {});
+	}
+		
+	int SquadID = Squads[SquadIndex].Num();
+	Squads[SquadIndex].Add(SquadMember);
+
+	return SquadID;
 }
 
 ATreasurePickup* UEnemySquadSubsystem::GetTreasure(int SquadIndex)
@@ -50,17 +84,8 @@ void UEnemySquadSubsystem::DisbandSquad(int SquadIndex)
 	{
 		Enemy->OnSquadDisbanded();
 	}
-	Squads.RemoveAt(SquadIndex);
-	Treasures.RemoveAt(SquadIndex);
-	for(int i = SquadIndex; i < Treasures.Num(); ++i)
-	{
-		for(AEnemyCharacter* Enemy : Squads[i])
-		{
-			Enemy->SquadIndex -= 1;
-		}
-
-		Treasures[i]->SquadIndex -= 1;
-	}
+	Squads.Remove(SquadIndex);
+	Treasures.Remove(SquadIndex);
 }
 
 void UEnemySquadSubsystem::RemoveSquadMember(int SquadIndex, AEnemyCharacter* SquadMember)

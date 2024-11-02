@@ -166,7 +166,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	int SquadID = -1;
 	// The index of the enemy's squad, used to pull information from the Enemy Squad Subsystem
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	int SquadIndex = -1;
 
 	// Value used to measure enemy's confidence in combat and control behaviours
@@ -204,7 +204,7 @@ protected:
 	FVector PlayerHeadOffset = FVector(0.0f, 0.0f, 60.0f);
 	// The offset from the ground to the point used when checking for cover
 	UPROPERTY(EditAnywhere)
-	FVector CoverCheckOffset = FVector(0.0f,0.0f,15.0f);
+	FVector CoverCheckOffset = FVector(0.0f,0.0f,40.0f);
 	// Function to recalculate bInCover based on current player position
 	void UpdateCover();
 	// Shortest time enemy can spend standing from cover to fire

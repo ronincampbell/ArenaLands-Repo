@@ -16,11 +16,13 @@ class AGP_API UEnemySquadSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<ATreasurePickup*> Treasures {};
-	TArray<TArray<AEnemyCharacter*>> Squads {};
+	TMap<int, ATreasurePickup*> Treasures {};
+	TMap<int, TArray<AEnemyCharacter*>> Squads {};
 
 public:
-	int CreateSquad(ATreasurePickup* Treasure, int NumEnemies, float SquadSpawnRadius);
+	void RegisterTreasure(int SquadIndex, ATreasurePickup* Treasure);
+	//int CreateSquad(ATreasurePickup* Treasure, int NumEnemies, float SquadSpawnRadius);
+	int RegisterSquadMember(int SquadIndex, AEnemyCharacter* SquadMember);
 	ATreasurePickup* GetTreasure(int SquadIndex);
 	TArray<AEnemyCharacter*> GetSquadMembers(int SquadIndex);
 	void DisbandSquad(int SquadIndex);

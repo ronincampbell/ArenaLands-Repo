@@ -38,6 +38,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateTreasurePickupMaterial();
 
+	UPROPERTY(EditAnywhere)
 	int SquadIndex = -1;
 	
 private:

@@ -15,7 +15,10 @@ void ATreasurePickup::BeginPlay()
 	GenerateTreasurePickup();
 	UpdateTreasurePickupMaterial();
 
-	SquadIndex = EnemySquadSubsystem->CreateSquad(this, NumEnemies, SquadSpawnRadius);
+	if(SquadIndex >= 0)
+	{
+		EnemySquadSubsystem->RegisterTreasure(SquadIndex, this);
+	}
 }
 
 void ATreasurePickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
