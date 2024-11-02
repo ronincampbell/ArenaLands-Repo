@@ -47,7 +47,9 @@ FVector UPathfindingSubsystem::GetPosInDirection(const FVector& StartLocation, c
 
 FVector UPathfindingSubsystem::FindNearestNodePos(const FVector& TargetLocation)
 {
-	return FindNearestNode(TargetLocation)->GetActorLocation();
+	ANavigationNode* NearestNode = FindNearestNode(TargetLocation);
+	if(NearestNode) return NearestNode->GetActorLocation();
+	return FVector {};
 }
 
 void UPathfindingSubsystem::PlaceProceduralNodes(const TArray<FVector>& LandscapeVertexData, int32 MapWidth, int32 MapHeight)

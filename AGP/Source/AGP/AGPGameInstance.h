@@ -5,6 +5,7 @@
 #include "Engine/GameInstance.h"
 #include "AGPGameInstance.generated.h"
 
+class AEnemyCharacter;
 class AWeaponPickup;
 /**
  * 
@@ -17,10 +18,13 @@ class AGP_API UAGPGameInstance : public UGameInstance
 public:
 
 	UClass* GetWeaponPickupClass() const;
+	UClass* GetEnemyClass() const;
 
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Pickup Classes")
 	TSubclassOf<AWeaponPickup> WeaponPickupClass;
+	UPROPERTY(EditDefaultsOnly, Category="Enemy Classes")
+	TSubclassOf<AEnemyCharacter> EnemyCharacterClass;
 	
 };

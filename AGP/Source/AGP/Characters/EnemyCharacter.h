@@ -39,6 +39,8 @@ class AGP_API AEnemyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
+	friend class UEnemySquadSubsystem;
+
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
@@ -93,6 +95,12 @@ protected:
 	UPROPERTY()
 	UPathfindingSubsystem* PathfindingSubsystem;
 
+	/**
+	 * A pointer to the Enemy Squad Subsystem.
+	 */
+	UPROPERTY()
+	UEnemySquadSubsystem* EnemySquadSubsystem;
+	
 	/**
 	 * A pointer to the PawnSensingComponent attached to this enemy character.
 	 */
@@ -154,12 +162,12 @@ protected:
 	FVector LastExplosiveLocation {};
 	float LastSeenPlayerHealth = 1.0f;
 
-	// The list of other enemies in this enemy's Squad, used for callouts and organisation
-	UPROPERTY(EditAnywhere)
-	TArray<AEnemyCharacter*> SquadMates;
 	// The enemy's ID within their squad, used to determine positioning when guarding and patrolling
 	UPROPERTY(VisibleAnywhere)
 	int SquadID = -1;
+	// The index of the enemy's squad, used to pull information from the Enemy Squad Subsystem
+	UPROPERTY(VisibleAnywhere)
+	int SquadIndex = -1;
 
 	// Value used to measure enemy's confidence in combat and control behaviours
 	UPROPERTY(VisibleAnywhere)
@@ -183,8 +191,7 @@ protected:
 	float MoralePushCutoff = 3.0f; 
 
 	// Determines whether enemy uses Guard or Patrol state when idle
-	UPROPERTY(EditAnywhere)
-	bool PatrolDuty = false;
+	bool HasPatrolDuty();
 	// Whether the enemy considers itself to be in cover (relative to the player)
 	UPROPERTY()
 	bool bInCover = false;
@@ -211,10 +218,9 @@ protected:
 	float MinimumHideDuration = 2.0f;
 	float CoverTimer = 0.0f;
 
-	// Treasure that enemy is trying to protect, defines center of territory
-	UPROPERTY(EditAnywhere)
-	ATreasurePickup* Treasure = nullptr;
-	bool HasTreasure();
+	// Whether the enemy has a treasure to protect
+	bool bHasTreasure = false;
+	void OnSquadDisbanded();
 	// Radius around Treasure to patrol
 	UPROPERTY(EditAnywhere)
 	float TerritoryRadius = 400.0f; 
@@ -244,8 +250,6 @@ protected:
 	void SendCallouts();
 	// Finds the nearest node to StartLocation that is considered cover
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
-	// Adds another enemy to this enemy's SquadMates array, along with the SquadMates of the other enemy
-	void AddSquadMate(AEnemyCharacter* NewSquadMate);
 	/**
 	 * Reassigns the squad ID of this enemy. Used after a SquadMate has died.
 	 * Also updates patrol duty and guard positions to redistribute load across squad
