@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "HealthComponent.h"
 #include "PlayerCharacter.h"
+#include "AGP/EnemySquadSubsystem.h"
 #include "AGP/Pathfinding/PathfindingSubsystem.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -33,31 +34,35 @@ void AEnemyCharacter::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to find the PathfindingSubsystem"))
 	}
+
+	EnemySquadSubsystem = GetWorld()->GetSubsystem<UEnemySquadSubsystem>();
+	if(!EnemySquadSubsystem)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Unable to find the EnemySquadSubsystem"))
+	}
+
+	if(SquadIndex >= 0)
+	{
+		SquadID = EnemySquadSubsystem->RegisterSquadMember(SquadIndex, this);
+	}
+	
 	if (PawnSensingComponent)
 	{
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSensedPawn);
 	}
 
-	if(!HasTreasure())
+	if(!bHasTreasure)
 	{
 		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
 	}
-	// Making sure squads are fully interconnected
-	for(AEnemyCharacter* SquadMate : SquadMates)
-	{
-		if(!SquadMate->SquadMates.Contains(this))
-		{
-			SquadMate->AddSquadMate(this);
-		}
-	}
 
-	ReassignSquadID();
+	EnterIdle();
 }
 
 void AEnemyCharacter::MoveAlongPath()
 {
 	// Execute the path. Should be called each tick.
-
+	//if(bPrintState) UE_LOG(LogTemp, Display, TEXT("Moving"))
 	// If the path is empty do nothing.
 	if (CurrentPath.IsEmpty()) return;
 	
@@ -76,19 +81,35 @@ void AEnemyCharacter::MoveAlongPath()
 
 void AEnemyCharacter::TickGuard()
 {
+	if(HasPatrolDuty())
+	{
+		EnterIdle();
+		return;
+	}
+	if(!bHasTreasure)
+	{
+		EnterIdle();
+		return;
+	}
 	if(CurrentPath.IsEmpty())
 	{
-		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GuardLocation);
-
-		if(HasTreasure())
+		if(bHasTreasure)
 		{
 			// Look away from treasure, to maximise area watched that player could approach from
-			FVector DirectionFromTreasure = GetActorLocation() - Treasure->GetActorLocation();
+			FVector DirectionFromTreasure = GetActorLocation() - EnemySquadSubsystem->GetTreasure(SquadIndex)->GetActorLocation();
 			FVector FlatDirection = DirectionFromTreasure.GetSafeNormal2D();
 
 			FRotator FlatRotation = FlatDirection.Rotation();
 			SetActorRotation(FlatRotation);
+
+			int SquadSize = EnemySquadSubsystem->GetSquadMembers(SquadIndex).Num();
+			float GuardAngle = 360/(SquadSize) * (SquadID+0.5f);
+			const FVector GuardDirection = FVector::ForwardVector.RotateAngleAxis(GuardAngle, FVector::UpVector);
+
+			GuardLocation = EnemySquadSubsystem->GetTreasure(SquadIndex)->GetActorLocation() + GuardDirection*GuardRadius;
 		}
+
+		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), GuardLocation);
 	}
 
 	MoveAlongPath();
@@ -96,21 +117,27 @@ void AEnemyCharacter::TickGuard()
 
 void AEnemyCharacter::TickPatrol()
 {
+	if(!HasPatrolDuty())
+	{
+		EnterIdle();
+		return;
+	}
+	// This state doesn't make sense if the enemy has no treasure, so leave if that's the case
+	if(!bHasTreasure)
+	{
+		EnterIdle();
+		return;
+	}
 	if(CurrentPath.IsEmpty())
 	{
-		// This state doesn't make sense if the enemy has no treasure, so leave if that's the case
-		if(!HasTreasure())
-		{
-			EnterIdle();
-			return;
-		}
 		// Perimeter is broken up into n chunks (for n SquadMates)
 		// Pick patrol locations within the chunk corresponding with SquadID
-		float StartAngle = 360/(SquadMates.Num()+1) * SquadID;
-		float RandAngle = FMath::FRandRange(StartAngle, StartAngle + 360/(SquadMates.Num()+1));
+		int SquadSize = EnemySquadSubsystem->GetSquadMembers(SquadIndex).Num();
+		float StartAngle = 360/(SquadSize) * SquadID;
+		float RandAngle = FMath::FRandRange(StartAngle, StartAngle + 360/(SquadSize));
 		const FVector PatrolDirection = FVector::ForwardVector.RotateAngleAxis(RandAngle, FVector::UpVector);
 
-		const FVector PatrolLocation = Treasure->GetActorLocation() + PatrolDirection*TerritoryRadius;
+		const FVector PatrolLocation = EnemySquadSubsystem->GetTreasure(SquadIndex)->GetActorLocation() + PatrolDirection*TerritoryRadius;
 		CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), PatrolLocation);
 	}
 
@@ -171,9 +198,9 @@ void AEnemyCharacter::TickHold(float DeltaTime)
 		if(!bInCover)
 		{
 			// Try to stay close to Treasure if it's secure
-			if(HasTreasure())
+			if(bHasTreasure)
 			{
-				CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearestCoverLocation(Treasure->GetActorLocation()));
+				CurrentPath = PathfindingSubsystem->GetPath(GetActorLocation(), FindNearestCoverLocation(EnemySquadSubsystem->GetTreasure(SquadIndex)->GetActorLocation()));
 			}
 			else
 			{
@@ -265,6 +292,7 @@ void AEnemyCharacter::TickScatter(float DeltaTime)
 
 void AEnemyCharacter::OnSensedPawn(APawn* SensedActor)
 {
+	if(bPrintState) UE_LOG(LogTemp, Display, TEXT("Enemy Spotted"))
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(SensedActor))
 	{
 		// Ignore the player if they're a spectator
@@ -304,7 +332,13 @@ void AEnemyCharacter::UpdateMorale()
 {
 	float NewMorale = 0.0f;
 	NewMorale += HealthComponent->GetCurrentHealthPercentage()*HealthMoraleContribution;
-	NewMorale += SquadMates.Num()*SquadMateMoraleContribution;
+
+	if(bHasTreasure)
+	{
+		int SquadMates = EnemySquadSubsystem->GetSquadMembers(SquadIndex).Num() - 1 ;
+		NewMorale += SquadMates*SquadMateMoraleContribution;
+	}
+	
 	if(SensedCharacter && DetectedPlayer)
 	{
 		NewMorale -= SensedCharacter->HealthComponent->GetCurrentHealthPercentage()*PlayerHealthMoraleContribution;
@@ -320,16 +354,27 @@ void AEnemyCharacter::UpdateMorale()
 	}
 }
 
+bool AEnemyCharacter::HasPatrolDuty()
+{
+	return SquadID % 2 != 0;
+}
+
 void AEnemyCharacter::UpdateCover()
 {
 	FVector PlayerPosition = GetCurrOrLastPlayerPos() + PlayerHeadOffset;
 	
 	FHitResult HitResult;
 	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-	for(AEnemyCharacter* SquadMate : SquadMates)
+	if(bHasTreasure)
 	{
-		QueryParams.AddIgnoredActor(SquadMate);
+		for(AEnemyCharacter* SquadMate : EnemySquadSubsystem->GetSquadMembers(SquadIndex))
+		{
+			QueryParams.AddIgnoredActor(SquadMate);
+		}	
+	}
+	else
+	{
+		QueryParams.AddIgnoredActor(this);
 	}
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation() + FootOffset + CoverCheckOffset, PlayerPosition, ECC_WorldStatic, QueryParams))
 	{
@@ -345,9 +390,9 @@ void AEnemyCharacter::UpdateCover()
 	bInCover = false;
 }
 
-bool AEnemyCharacter::HasTreasure()
+void AEnemyCharacter::OnSquadDisbanded()
 {
-	return IsValid(Treasure);
+	bHasTreasure = false;
 }
 
 void AEnemyCharacter::EnterCombat()
@@ -377,11 +422,11 @@ void AEnemyCharacter::EnterCombat()
 void AEnemyCharacter::EnterIdle()
 {
 	EEnemyState DesiredState {};
-	if(!HasTreasure())
+	if(!bHasTreasure)
 	{
 		DesiredState = EEnemyState::Wander;
 	}
-	else if(PatrolDuty)
+	else if(HasPatrolDuty())
 	{
 		DesiredState = EEnemyState::Patrol;
 	}
@@ -425,8 +470,10 @@ void AEnemyCharacter::ReceiveCallout(APlayerCharacter* SensedPlayer)
 
 void AEnemyCharacter::SendCallouts()
 {
-	for(AEnemyCharacter* SquadMate : SquadMates)
+	for(AEnemyCharacter* SquadMate : EnemySquadSubsystem->GetSquadMembers(SquadIndex))
 	{
+		if(SquadMate == this) continue;
+		
 		SquadMate->ReceiveCallout(SensedCharacter);
 	}
 }
@@ -449,12 +496,19 @@ FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) 
 
 		FHitResult HitResult;
 		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-		// Ignore squadmates, so that enemies don't try to hide behind each other
-		for(AEnemyCharacter* SquadMate : SquadMates)
+		if(bHasTreasure)
 		{
-			QueryParams.AddIgnoredActor(SquadMate);
+			// Ignore squadmates, so that enemies don't try to hide behind each other
+			for(AEnemyCharacter* SquadMate : EnemySquadSubsystem->GetSquadMembers(SquadIndex))
+			{
+				QueryParams.AddIgnoredActor(SquadMate);
+			}
 		}
+		else
+		{
+			QueryParams.AddIgnoredActor(this);
+		}
+		
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, CheckPosition, PlayerPosition, ECC_WorldStatic, QueryParams))
 		{
 			//If the line trace didn't hit the player
@@ -486,60 +540,6 @@ FVector AEnemyCharacter::FindNearestCoverLocation(const FVector& StartLocation) 
 	
 }
 
-void AEnemyCharacter::AddSquadMate(AEnemyCharacter* NewSquadMate)
-{
-	SquadMates.Add(NewSquadMate);
-
-	//Add squad mates of new squad mate
-	for(AEnemyCharacter* SquadMate : NewSquadMate->SquadMates)
-	{
-		if(SquadMate == this)
-		{
-			continue;
-		}
-		if(!SquadMates.Contains(SquadMate))
-		{
-			AddSquadMate(SquadMate);
-		}
-	}
-}
-
-void AEnemyCharacter::ReassignSquadID()
-{
-	int HighestExistingID = -1;
-	
-	for(AEnemyCharacter* SquadMate : SquadMates)
-	{
-		if(SquadMate->SquadID > HighestExistingID)
-		{
-			HighestExistingID = SquadMate->SquadID;
-		}
-	}
-
-	SquadID = HighestExistingID + 1;
-
-	if(SquadID%2 == 1)
-	{
-		PatrolDuty = true;
-	}
-	else
-	{
-		PatrolDuty = false;
-	}
-
-	if(HasTreasure())
-	{
-		FVector GuardDirection = FVector::ForwardVector.RotateAngleAxis(360/(SquadMates.Num()+1) * SquadID, FVector::UpVector);
-		GuardLocation = PathfindingSubsystem->FindNearestNodePos(Treasure->GetActorLocation()+GuardDirection*GuardRadius);
-	}
-
-	// Used so that the enemy will change state between Guard and Patrol if their duty changed
-	if(IsIdle())
-	{
-		EnterIdle();
-	}
-}
-
 bool AEnemyCharacter::IsSafeToFire(const FVector& FireLocation) const
 {
 	FHitResult HitResult;
@@ -564,16 +564,11 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	//Handle destroying self and removing self from squad
 	if(HealthComponent->IsDead())
 	{
-		for(AEnemyCharacter* SquadMate : SquadMates)
+		if(bHasTreasure)
 		{
-			SquadMate->SquadMates.Remove(this);
-			SquadMate->SquadID = -1;
+			EnemySquadSubsystem->RemoveSquadMember(SquadIndex, this);
 		}
-		for(AEnemyCharacter* SquadMate : SquadMates)
-		{
-			SquadMate->ReassignSquadID();
-		}
-
+		
 		Destroy();
 		return;
 	}
@@ -606,7 +601,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 			DetectionTimer = ReturnToIdleDelay;
 			DetectedPlayer = true;
 			//Inform squad of player position
-			if(HasTreasure())
+			if(bHasTreasure)
 			{
 				SendCallouts();
 			}
