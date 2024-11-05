@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "HealthComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -38,6 +39,16 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// check health component to see if player is dead
+	if (HealthComponent->IsDead())
+    {
+        isDead = true;
+    }
+    else
+    {
+        isDead = false;
+    }
 
 }
 
