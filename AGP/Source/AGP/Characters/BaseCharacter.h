@@ -67,7 +67,7 @@ protected:
 	 * A component that holds information about the health of the character. This component has functions
 	 * for damaging the character and healing the character.
 	 */
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Replicated)
 	UHealthComponent* HealthComponent;
 
 	/**
