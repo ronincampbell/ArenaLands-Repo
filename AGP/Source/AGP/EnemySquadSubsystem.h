@@ -7,6 +7,7 @@
 #include "Subsystems/WorldSubsystem.h"
 #include "EnemySquadSubsystem.generated.h"
 
+class ATreasurePickup;
 /**
  * 
  */

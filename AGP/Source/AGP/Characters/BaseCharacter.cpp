@@ -2,7 +2,11 @@
 
 
 #include "BaseCharacter.h"
+
+#include "EnemyCharacter.h"
 #include "HealthComponent.h"
+#include "PlayerCharacter.h"
+#include "AGP/MultiplayerGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -14,13 +18,6 @@ ABaseCharacter::ABaseCharacter()
 	BulletStartPosition = CreateDefaultSubobject<USceneComponent>("Bullet Start");
 	BulletStartPosition->SetupAttachment(GetRootComponent());
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("Health Component");
-}
-
-void ABaseCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ABaseCharacter, WeaponComponent);
 }
 
 // Called when the game starts or when spawned
@@ -81,10 +78,87 @@ void ABaseCharacter::UpdateModBools(const FWeaponStats& WeaponStats)
 	}
 
 	if (WeaponStats.IsShotgun)
-    {
-        bIsShotgun = true;
-        ActiveMods += "- Shotgun Mod\n";
-    }
+	{
+		bIsShotgun = true;
+		ActiveMods += "- Shotgun Mod\n";
+	}
+
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(this))
+	{
+		PlayerCharacter->UpdateModificationDetails(ActiveMods);
+	}
+}
+
+void ABaseCharacter::Reload()
+{
+	if (HasWeapon())
+	{
+		WeaponComponent->Reload();
+	}
+}
+
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABaseCharacter, WeaponComponent);
+
+	DOREPLIFETIME(ABaseCharacter, bHasFireRateMod)
+	DOREPLIFETIME(ABaseCharacter, bHasBaseDamageMod)
+	DOREPLIFETIME(ABaseCharacter, bHasMagazineSizeMod)
+	DOREPLIFETIME(ABaseCharacter, bHasReloadTimeMod)
+	DOREPLIFETIME(ABaseCharacter, bIsExplosive)
+	DOREPLIFETIME(ABaseCharacter, bIsShotgun)
+}
+
+void ABaseCharacter::OnDeath()
+{
+	// WE ONLY WANT TO HANDLE LOGIC IF IT IS ON THE SERVER
+	if (GetLocalRole() != ROLE_Authority) return;
+
+	// IT IS PROBABLY BETTER PRACTICE TO INCLUDE THE PLAYER CHARACTER AND ENEMY CHARACTER DEATH LOGIC IN THEIR
+	// OWN CLASSES INSTEAD OF HANDLING IT ON THE BASE CHARACTER (my bad...)
+	if (AMultiplayerGameMode* GameMode = Cast<AMultiplayerGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(this))
+		{
+			// Tell the GameMode to respawn this player.
+			//GameMode->RespawnPlayer(GetController());
+			PlayerCharacter->UpdateGameOverVisibility(true);
+		}
+
+		if (AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(this))
+		{
+			EnemyCharacter->OnEnemyDeath();
+			//GameMode->RespawnEnemy(EnemyCharacter);
+		}
+	}
+	
+}
+
+// Called every frame
+void ABaseCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+bool ABaseCharacter::HasWeapon()
+{
+	return (WeaponComponent != nullptr);
+}
+
+void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponStats)
+{
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		EquipWeaponImplementation(bEquipWeapon, WeaponStats);
+		MulticastEquipWeapon(bEquipWeapon, WeaponStats);
+	}
+}
+
+// Called to bind functionality to input
+void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 void ABaseCharacter::EquipWeaponImplementation(bool bEquipWeapon, const FWeaponStats& WeaponStats)
@@ -108,10 +182,10 @@ void ABaseCharacter::EquipWeaponImplementation(bool bEquipWeapon, const FWeaponS
 		// Set the weapons stats to the given weapon stats.
 		UE_LOG(LogTemp, Display, TEXT("Equipping weapon: \n%s"), *WeaponStats.ToString())
 		WeaponComponent->SetWeaponStats(WeaponStats);
-		UpdateModBools(WeaponStats);
 	}
-	
-	EquipWeaponGraphical(bEquipWeapon);
+
+	UpdateModBools(WeaponStats);
+
 	if (bEquipWeapon)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Player has equipped weapon."))
@@ -122,42 +196,9 @@ void ABaseCharacter::EquipWeaponImplementation(bool bEquipWeapon, const FWeaponS
 	}
 }
 
-void ABaseCharacter::MulticastEquipWeapon_Implementation(bool bEquipWeapon)
+void ABaseCharacter::MulticastEquipWeapon_Implementation(bool bEquipWeapon, const FWeaponStats& WeaponStats)
 {
+	//EquipWeaponImplementation(bEquipWeapon, WeaponStats);
 	EquipWeaponGraphical(bEquipWeapon);
-}
-
-void ABaseCharacter::Reload()
-{
-	if (HasWeapon())
-	{
-		WeaponComponent->Reload();
-	}
-}
-
-// Called every frame
-void ABaseCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-bool ABaseCharacter::HasWeapon()
-{
-	return (WeaponComponent != nullptr);
-}
-
-void ABaseCharacter::EquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponStats)
-{
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		EquipWeaponImplementation(bEquipWeapon, WeaponStats);
-		MulticastEquipWeapon(bEquipWeapon);
-	}
-}
-
-// Called to bind functionality to input
-void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 

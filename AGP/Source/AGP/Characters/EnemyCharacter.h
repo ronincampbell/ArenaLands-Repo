@@ -3,10 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "BaseCharacter.h"
 #include "PlayerCharacter.h"
-#include "AGP/Pickups/TreasurePickup.h"
 #include "EnemyCharacter.generated.h"
 
 // Forward declarations to avoid needing to #include files in the header of this class.
@@ -40,20 +38,19 @@ class AGP_API AEnemyCharacter : public ABaseCharacter
 	GENERATED_BODY()
 
 	friend class UEnemySquadSubsystem;
-
+	friend class ABaseCharacter;
+	
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
 
 	// To be called when an explosion goes off close to the enemy
 	void OnHearExplosion(const FVector& ExplosionLocation);
-
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UPROPERTY(VisibleAnywhere)
-	//USceneComponent* CoverCheckPosition;
 	/**
 	 * Will move the character along the CurrentPath or do nothing to the character if the path is empty.
 	 */
@@ -81,13 +78,13 @@ protected:
 	 */
 	UFUNCTION()
 	void OnSensedPawn(APawn* SensedActor);
-	
 	/**
 	 * Will update the SensedCharacter variable based on whether the UPawnSensingComponent has a line of sight to the
 	 * Player Character or not. This may cause the SensedCharacter variable to become a nullptr so be careful when using
 	 * the SensedCharacter variable.
 	 */
 	void UpdateSight();
+	void OnEnemyDeath();
 
 	/**
 	 * A pointer to the Pathfinding Subsystem.
@@ -112,7 +109,7 @@ protected:
 	 * see any PlayerCharacter.
 	 */
 	UPROPERTY()
-	APlayerCharacter* SensedCharacter = nullptr;
+	TWeakObjectPtr<APlayerCharacter> SensedCharacter;
 
 	/**
 	 * An array of vectors representing the current path that the agent is traversing along.
@@ -132,6 +129,7 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere)
 	float PathfindingError = 150.0f; // 150 cm from target by default.
+
 
 	// The delay, in seconds, before the enemy fully detects the player if sight line isn't broken
 	UPROPERTY(EditAnywhere)
@@ -156,7 +154,7 @@ protected:
 	float ScatterTimeout = 2.0f;
 	float ScatterTimer = 0.0f;
 
-	// The last place the enemy saw the player, so the enemy doesn't lose track of the player as soon as they go around a corner
+// The last place the enemy saw the player, so the enemy doesn't lose track of the player as soon as they go around a corner
 	FVector LastSeenPlayerLocation {};
 	// The last place the enemy heard an explosion from, used to scatter away from the location
 	FVector LastExplosiveLocation {};
@@ -251,18 +249,13 @@ protected:
 	// Finds the nearest node to StartLocation that is considered cover
 	FVector FindNearestCoverLocation(const FVector& StartLocation) const;
 	/**
-	 * Reassigns the squad ID of this enemy. Used after a SquadMate has died.
-	 * Also updates patrol duty and guard positions to redistribute load across squad
-	 */
-	void ReassignSquadID();
-	/**
 	 * Determines whether it is safe to fire at FireLocation
 	 * A shot is unsafe if a perfectly accurate shot towards the location would hit another enemy
 	 * @param FireLocation The location to fire at
 	 * @return Whether it is safe to fire at FireLocation
 	 */
 	bool IsSafeToFire(const FVector& FireLocation) const;
-
+	
 public:	
 
 	virtual void Tick(float DeltaTime) override;
@@ -271,12 +264,14 @@ public:
 private:
 	
 	/**
-	 * NOT USED ANYMORE - Was used for TickEvade and TickEngage before we setup the UPawnSensingComponent.
+	 * @deprecated Was used for TickEvade and TickEngage before we setup the UPawnSensingComponent.
 	 * @return A pointer to one APlayerCharacter actor in the world.
 	 */
 	APlayerCharacter* FindPlayer() const;
 
 	// Gets the current position of the player or, if the player isn't within sight, the last position they were seen at
 	FVector GetCurrOrLastPlayerPos() const;
+	
+	void FaceTowards(const FVector& TargetLocation);
 
 };

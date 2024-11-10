@@ -24,7 +24,7 @@ void ATreasurePickup::BeginPlay()
 void ATreasurePickup::OnPickupOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitInfo)
 {
-	if (ABaseCharacter* Player = Cast<ABaseCharacter>(OtherActor))
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor))
 	{
 		Player->EquipWeapon(true, WeaponStats);
 		EnemySquadSubsystem->DisbandSquad(SquadIndex);
@@ -67,7 +67,7 @@ TArray<EWeaponModification> ATreasurePickup::GenerateWeaponModifications(int32 N
 	}
 
 	return Modifications;
-}
+} 
 
 void ATreasurePickup::ApplyWeaponModifications(const TArray<EWeaponModification>& Modifications)
 {

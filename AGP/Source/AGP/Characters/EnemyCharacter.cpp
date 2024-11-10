@@ -7,6 +7,7 @@
 #include "PlayerCharacter.h"
 #include "AGP/EnemySquadSubsystem.h"
 #include "AGP/Pathfinding/PathfindingSubsystem.h"
+#include "AGP/Pickups/TreasurePickup.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
@@ -16,9 +17,6 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("Pawn Sensing Component");
-
-	//CoverCheckPosition = CreateDefaultSubobject<USceneComponent>("Cover check");
-	//CoverCheckPosition->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +24,9 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// DO NOTHING IF NOT ON THE SERVER
+	if (GetLocalRole() != ROLE_Authority) return;
+	
 	PathfindingSubsystem = GetWorld()->GetSubsystem<UPathfindingSubsystem>();
 	if (PathfindingSubsystem)
 	{
@@ -50,7 +51,7 @@ void AEnemyCharacter::BeginPlay()
 	{
 		PawnSensingComponent->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSensedPawn);
 	}
-
+	
 	if(!bHasTreasure)
 	{
 		GuardLocation = PathfindingSubsystem->FindNearestNodePos(GetActorLocation());
@@ -62,7 +63,7 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::MoveAlongPath()
 {
 	// Execute the path. Should be called each tick.
-	//if(bPrintState) UE_LOG(LogTemp, Display, TEXT("Moving"))
+
 	// If the path is empty do nothing.
 	if (CurrentPath.IsEmpty()) return;
 	
@@ -292,13 +293,10 @@ void AEnemyCharacter::TickScatter(float DeltaTime)
 
 void AEnemyCharacter::OnSensedPawn(APawn* SensedActor)
 {
-	if(bPrintState) UE_LOG(LogTemp, Display, TEXT("Enemy Spotted"))
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(SensedActor))
 	{
-		// Ignore the player if they're a spectator
-		if(!Player->IsSpectator()){
-			SensedCharacter = Player;
-		}
+		SensedCharacter = Player;
+		//UE_LOG(LogTemp, Display, TEXT("Sensed Player"))
 	}
 }
 
@@ -313,24 +311,24 @@ void AEnemyCharacter::OnHearExplosion(const FVector& ExplosionLocation)
 
 void AEnemyCharacter::UpdateSight()
 {
-	if (!SensedCharacter) return;
+	if (!SensedCharacter.IsValid()) return;
 	if (PawnSensingComponent)
 	{
-		if (!PawnSensingComponent->HasLineOfSightTo(SensedCharacter))
+		if (!PawnSensingComponent->HasLineOfSightTo(SensedCharacter.Get()))
 		{
-			// Update the last place the player was seen just as the enemy loses sight of them
 			LastSeenPlayerLocation = PathfindingSubsystem->FindNearestNodePos(SensedCharacter->GetActorLocation());
 			LastSeenPlayerHealth = SensedCharacter->HealthComponent->GetCurrentHealthPercentage();
+			
 			SensedCharacter = nullptr;
-			UE_LOG(LogTemp, Display, TEXT("Lost Player"))
+			//UE_LOG(LogTemp, Display, TEXT("Lost Player"))
 		}
 	}
 }
 
-
 void AEnemyCharacter::UpdateMorale()
 {
 	float NewMorale = 0.0f;
+	//UE_LOG(LogTemp, Display, TEXT("Health Percent: %f"), HealthComponent->GetCurrentHealthPercentage())
 	NewMorale += HealthComponent->GetCurrentHealthPercentage()*HealthMoraleContribution;
 
 	if(bHasTreasure)
@@ -339,7 +337,7 @@ void AEnemyCharacter::UpdateMorale()
 		NewMorale += SquadMates*SquadMateMoraleContribution;
 	}
 	
-	if(SensedCharacter && DetectedPlayer)
+	if(SensedCharacter.IsValid() && DetectedPlayer)
 	{
 		NewMorale -= SensedCharacter->HealthComponent->GetCurrentHealthPercentage()*PlayerHealthMoraleContribution;
 	}
@@ -474,7 +472,7 @@ void AEnemyCharacter::SendCallouts()
 	{
 		if(SquadMate == this) continue;
 		
-		SquadMate->ReceiveCallout(SensedCharacter);
+		SquadMate->ReceiveCallout(SensedCharacter.Get());
 	}
 }
 
@@ -556,22 +554,24 @@ bool AEnemyCharacter::IsSafeToFire(const FVector& FireLocation) const
 	return true;
 }
 
+void AEnemyCharacter::OnEnemyDeath()
+{
+	if(bHasTreasure)
+	{
+		EnemySquadSubsystem->RemoveSquadMember(SquadIndex, this);
+	}
+		
+	Destroy();
+}
+
+
 // Called every frame
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Handle destroying self and removing self from squad
-	if(HealthComponent->IsDead())
-	{
-		if(bHasTreasure)
-		{
-			EnemySquadSubsystem->RemoveSquadMember(SquadIndex, this);
-		}
-		
-		Destroy();
-		return;
-	}
+	// DO NOTHING UNLESS IT IS ON THE SERVER
+	if (GetLocalRole() != ROLE_Authority) return;
 
 	if(HasWeapon())
 	{
@@ -590,7 +590,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		//This condition just prevents the detection code from running and interrupting scattering
 	}
 	//If player is spotted while idle
-	else if(SensedCharacter && !DetectedPlayer)
+	else if(SensedCharacter.IsValid() && !DetectedPlayer)
 	{
 		DetectionTimer += DeltaTime;
 
@@ -610,12 +610,12 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	}
 	//Reset timer if enemy can see player
 	//Avoids losing detection over time when ducking behind cover
-	else if(SensedCharacter && DetectedPlayer)
+	else if(SensedCharacter.IsValid() && DetectedPlayer)
 	{
 		DetectionTimer = ReturnToIdleDelay;
 	}
 	//If sight line is lost
-	else if(!SensedCharacter)
+	else if(!SensedCharacter.IsValid())
 	{
 		if(DetectionTimer > 0)
 		{
@@ -642,18 +642,9 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 	//Turn to look at player as long as they're spotted
 	//Should help with consistent spotting and also give visual feedback
-	if(SensedCharacter && ScatterTimer <= 0)
+	if(SensedCharacter.IsValid() && ScatterTimer <= 0)
 	{
-		FVector DirectionToPlayer = SensedCharacter->GetActorLocation() - GetActorLocation();
-		FVector FlatDirection = DirectionToPlayer.GetSafeNormal2D();
-		if(CurrentState == EEnemyState::Retreat)
-		{
-			FlatDirection *= -1;
-		}
-
-		FRotator FlatRotation = FlatDirection.Rotation();
-		
-		SetActorRotation(FlatRotation);
+		FaceTowards(SensedCharacter->GetActorLocation());
 	}
 
 	if(bIsCrouched && CurrentState != EEnemyState::Hold)
@@ -696,11 +687,6 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		if(bPrintState) UE_LOG(LogTemp, Display, TEXT("State: Scatter"))
 		break;
 	}
-
-	/*UE_LOG(LogTemp, Display, TEXT("Morale: %f"), CurrentMorale)
-	UE_LOG(LogTemp, Display, TEXT("Cover: %hs"), InCover ? "True" : "False")
-	UE_LOG(LogTemp, Display, TEXT("Sensed: %hs"), SensedCharacter ? "True" : "False")
-	UE_LOG(LogTemp, Display, TEXT("Detected: %hs"), DetectedPlayer ? "True" : "False")*/
 }
 
 // Called to bind functionality to input
@@ -725,12 +711,23 @@ APlayerCharacter* AEnemyCharacter::FindPlayer() const
 	return Player;
 }
 
+
 FVector AEnemyCharacter::GetCurrOrLastPlayerPos() const
 {
-	if(DetectedPlayer && SensedCharacter)
+	if(DetectedPlayer && SensedCharacter.IsValid())
 	{
 		return SensedCharacter->GetActorLocation();
 	}
 	
 	return LastSeenPlayerLocation;
 }
+
+void AEnemyCharacter::FaceTowards(const FVector& TargetLocation)
+{
+	// The direction of the target location from the enemy characters current location.
+	FVector Direction = TargetLocation - GetActorLocation();
+	Direction.Z = 0; // We only want it to rotate in the XY plane.
+
+	SetActorRotation(Direction.Rotation());
+}
+

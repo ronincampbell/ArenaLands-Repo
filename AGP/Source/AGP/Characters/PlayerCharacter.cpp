@@ -5,8 +5,9 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "HealthComponent.h"
+#include "AGP/PlayerCharacterHUD.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -15,9 +16,75 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-bool APlayerCharacter::IsSpectator()
+void APlayerCharacter::UpdateHealthBar(float HealthPercent)
 {
-	return bIsSpectator;
+	if (PlayerHUD && IsLocallyControlled())
+	{
+		PlayerHUD->SetHealthBar(HealthPercent);
+	}
+}
+
+void APlayerCharacter::UpdateAmmoUI(int32 RoundsRemaining, int32 MagazineSize)
+{
+	if (PlayerHUD && IsLocallyControlled())
+	{
+		PlayerHUD->SetAmmoText(RoundsRemaining, MagazineSize);
+	}
+}
+
+void APlayerCharacter::UpdateModificationDetails(const FString& ModDetails)
+{
+	ServerUpdateModificationDetails(ModDetails);
+}
+
+void APlayerCharacter::UpdateGameOverVisibility(bool isGameOver)
+{
+	ServerUpdateGameOverVisibility(isGameOver);
+}
+
+
+void APlayerCharacter::ServerUpdateModificationDetails_Implementation(const FString& ModDetails)
+{
+	MulticastUpdateModificationDetails(ModDetails);
+}
+
+void APlayerCharacter::ServerUpdateGameOverVisibility_Implementation(bool isGameOver)
+{
+	MulticastUpdateGameOverVisibility(isGameOver);
+}
+
+void APlayerCharacter::MulticastUpdateModificationDetails_Implementation(const FString& ModDetails)
+{
+	if (PlayerHUD)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Updating mods success"))
+		PlayerHUD->SetModificationDetails(ModDetails);
+		UpdateModsGraphical();
+	}
+}
+
+void APlayerCharacter::MulticastUpdateGameOverVisibility_Implementation(bool isGameOver)
+{
+	if (PlayerHUD)
+	{
+		PlayerHUD->SetGameOverVisibility(isGameOver);
+	}
+}
+
+void APlayerCharacter::DrawUI()
+{
+	if (IsLocallyControlled() && PlayerHUDClass)
+	{
+		if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+		{
+			PlayerHUD = CreateWidget<UPlayerCharacterHUD>(PlayerController, PlayerHUDClass);
+			if (PlayerHUD)
+			{
+				PlayerHUD->AddToPlayerScreen();
+			}
+		}
+	}
+	UpdateHealthBar(1.0f);
 }
 
 // Called when the game starts or when spawned
@@ -33,22 +100,23 @@ void APlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
+	DrawUI();
+}
+
+void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	if (PlayerHUD)
+	{
+		PlayerHUD->RemoveFromParent();
+	}
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// check health component to see if player is dead
-	if (HealthComponent->IsDead())
-    {
-        isDead = true;
-    }
-    else
-    {
-        isDead = false;
-    }
 
 }
 
@@ -64,7 +132,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		Input->BindAction(FireAction, ETriggerEvent::Triggered, this, &APlayerCharacter::FireWeapon);
 		Input->BindAction(ReloadAction, ETriggerEvent::Started, this, &ABaseCharacter::Reload);
-		Input->BindAction(SpectatorAction, ETriggerEvent::Started, this, &APlayerCharacter::ToggleSpectator);
 	}
 }
 
@@ -94,10 +161,5 @@ void APlayerCharacter::FireWeapon(const FInputActionValue& Value)
 	{
 		Fire(BulletStartPosition->GetComponentLocation() + 10000.0f * CameraForward);
 	}
-}
-
-void APlayerCharacter::ToggleSpectator(const FInputActionValue& Value)
-{
-	bIsSpectator = !bIsSpectator;
 }
 

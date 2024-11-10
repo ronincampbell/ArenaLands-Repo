@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -25,6 +27,9 @@ enum class EWeaponModification : uint8
 	IsShotgun
 };
 
+/**
+ * 
+ */
 UCLASS()
 class AGP_API AWeaponPickup : public APickupBase
 {
@@ -32,9 +37,9 @@ class AGP_API AWeaponPickup : public APickupBase
 
 protected:
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	EWeaponRarity WeaponRarity = EWeaponRarity::Common;
-	
+	UPROPERTY(Replicated)
 	FWeaponStats WeaponStats;
 
 	virtual void BeginPlay() override;
@@ -44,9 +49,13 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateWeaponPickupMaterial();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 private:
+
 	void GenerateWeaponPickup();
 	EWeaponRarity WeaponRarityPicker();
 	TArray<EWeaponModification> GenerateWeaponModifications(int32 NumModifications);
 	void ApplyWeaponModifications(const TArray<EWeaponModification>& Modifications);
+	
 };

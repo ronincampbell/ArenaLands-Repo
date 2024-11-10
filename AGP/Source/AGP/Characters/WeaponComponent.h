@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,6 +12,25 @@ enum class EWeaponType : uint8 {
 	Pistol
 };
 
+UENUM(BlueprintType)
+enum class EWeaponHitType : uint8
+{
+	NoHit,
+	Character,
+	Dirt
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponHitInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FVector HitLocation;
+	UPROPERTY()
+	EWeaponHitType HitType;
+};
+
 USTRUCT(BlueprintType)
 struct FWeaponStats
 {
@@ -20,12 +41,14 @@ public:
 	float Accuracy = 1.0f;
 	float FireRate = 0.2f;
 	float BaseDamage = 10.0f;
+	UPROPERTY()
 	int32 MagazineSize = 5;
 	float ReloadTime = 1.0f;
+	UPROPERTY()
 	bool IsExplosive = false;
 	bool IsShotgun = false;
 	float ExplosionRadius = 200.0f;
-
+	float ExplosionSoundMultiplier = 2.0f;
 	/**
 	 * A debug ToString function that allows the easier printing of the weapon stats.
 	 * @return A string detailing the weapon stats stored in this struct.
@@ -33,6 +56,7 @@ public:
 	FString ToString() const
 	{
 		FString WeaponString = "";
+		WeaponString += "Accuracy:      " + FString::SanitizeFloat(Accuracy) + "\n";
 		WeaponString += "Fire Rate:     " + FString::SanitizeFloat(FireRate) + "\n";
 		WeaponString += "Base Damage:   " + FString::SanitizeFloat(BaseDamage) + "\n";
 		WeaponString += "Magazine Size: " + FString::FromInt(MagazineSize) + "\n";
@@ -61,24 +85,21 @@ public:
 
 	bool IsMagazineEmpty();
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	int32 UIAmmoRemaining;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	int32 UIMagazineSize;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	float UIReloadSpeed;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool UIBIsReloading;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
+
+	UPROPERTY(ReplicatedUsing=UpdateAmmoUI)
 	FWeaponStats WeaponStats;
+	UPROPERTY(ReplicatedUsing=UpdateAmmoUI)
 	int32 RoundsRemainingInMagazine;
 	float TimeSinceLastShot;
-	
 	bool bIsReloading = false;
+
+	UFUNCTION()
+	void UpdateAmmoUI();
 
 public:	
 	// Called every frame
@@ -90,15 +111,17 @@ private:
 	 */
 	void CompleteReload();
 	float CurrentReloadDuration = 0.0f;
-	const float ExplosionSoundRadiusMultiplier = 2.0f;
 
-	bool FireImplementation(const FVector& BulletStart, const FVector& FireAtLocation, FVector& OutHitLocation);
-
-	void FireVisualImplementation(const FVector& BulletStart, const FVector& HitLocation);
-
+	bool FireImplementation(const FVector& BulletStart, const FVector& FireAtLocation, FWeaponHitInfo& HitInfo);
+	void FireVisualImplementation(const FVector& BulletStart, const FWeaponHitInfo& HitInfo);
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastFire(const FVector& BulletStart, const FVector& HitLocation);
-
+	void MulticastFire(const FVector& BulletStart, const FWeaponHitInfo& HitInfo);
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector& BulletStart, const FVector& FireAtLocation);
+
+	// RELOAD FUNCTIONS
+	void ReloadImplementation();
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+	
 };

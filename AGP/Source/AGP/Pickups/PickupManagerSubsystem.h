@@ -7,6 +7,7 @@
 #include "PickupManagerSubsystem.generated.h"
 
 class AWeaponPickup;
+class APickupBase;
 /**
  * 
  */
@@ -21,12 +22,19 @@ public:
 		return TStatId();
 	}
 
+	void PickupConsumed(APickupBase* Pickup);
+
 protected:
 	
 	/**
 	 * The world locations of all possible locations that a pickup can spawn.
 	 */
 	TArray<FVector> PossibleSpawnLocations;
+	/**
+	 * Will store all the weapon pickups that have been spawned, using the index of the possible spawn location
+	 * as the key.
+	 */
+	TMap<int32, APickupBase*> SpawnedPickups;
 	float PickupSpawnRate = 5.0f;
 	float TimeSinceLastSpawn = 0.0f;
 	

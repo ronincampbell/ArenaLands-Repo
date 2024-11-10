@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "PlayerCharacter.generated.h"
 
+class UPlayerCharacterHUD;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -15,18 +16,38 @@ UCLASS()
 class AGP_API APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
-	
+
 	friend class AEnemyCharacter;
 
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
-	UFUNCTION(BlueprintCallable)
-	bool IsSpectator();
+
+	void UpdateHealthBar(float HealthPercent);
+	void UpdateAmmoUI(int32 RoundsRemaining, int32 MagazineSize);
+	void UpdateModificationDetails(const FString& ModDetails);
+	void UpdateGameOverVisibility(bool isGameOver);
+
+	UFUNCTION(Server, Reliable)
+	void ServerUpdateModificationDetails(const FString& ModDetails);
+	UFUNCTION(Server, Reliable)
+	void ServerUpdateGameOverVisibility(bool isGameOver);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateModificationDetails(const FString& ModDetails);
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateGameOverVisibility(bool isGameOver);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateModsGraphical();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChooseCharacterMesh();
+	void DrawUI();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* MoveAction;
@@ -39,14 +60,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* ReloadAction;
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SpectatorAction;
-	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* InputMappingContext;
 
 	UPROPERTY(EditDefaultsOnly)
 	float LookSensitivity = 0.5f;
-	UPROPERTY(EditAnywhere)
-	bool bIsSpectator = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPlayerCharacterHUD> PlayerHUDClass;
+	UPROPERTY()
+	UPlayerCharacterHUD* PlayerHUD;
+	
+	
 
 public:	
 	// Called every frame
@@ -54,15 +78,11 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	bool isDead = false;
 	
 private:
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void FireWeapon(const FInputActionValue& Value);
-	void ToggleSpectator(const FInputActionValue& Value);
 
 };

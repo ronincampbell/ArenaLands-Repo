@@ -25,31 +25,36 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void EquipWeaponGraphical(bool bEquipWeapon);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReloadWeaponGraphical(float ReloadTime);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void FireWeaponGraphical();
+
 	/**
 	 * Will reload the weapon if the character has a weapon equipped.
 	 */
 	void Reload();
 
-	// Public bools for each modification so we can use them for models in the blueprint
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void OnDeath();
+
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bHasFireRateMod = false;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bHasBaseDamageMod = false;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bHasMagazineSizeMod = false;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bHasReloadTimeMod = false;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bIsExplosive = false;
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, Replicated)
 	bool bIsShotgun = false;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FString ActiveMods = "Equipped Mods: \n";
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	
 
 protected:
 	// Called when the game starts or when spawned
@@ -67,7 +72,7 @@ protected:
 	 * A component that holds information about the health of the character. This component has functions
 	 * for damaging the character and healing the character.
 	 */
-	UPROPERTY(VisibleAnywhere, Replicated)
+	UPROPERTY(VisibleAnywhere)
 	UHealthComponent* HealthComponent;
 
 	/**
@@ -80,18 +85,10 @@ protected:
 	 * Will fire at a specific location and handles the impact of the shot such as determining what it hit and
 	 * deducting health if it hit a particular type of actor.
 	 * @param FireAtLocation The location that you want to fire at.
-	 * @return true if a shot was taken and false otherwise.
 	 */
 	void Fire(const FVector& FireAtLocation);
 
-	// Updates modification bools based on weapon stats
 	void UpdateModBools(const FWeaponStats& WeaponStats);
-
-private:
-	void EquipWeaponImplementation(bool bEquipWeapon, const FWeaponStats& WeaponStats = FWeaponStats());
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastEquipWeapon(bool bEquipWeapon);
 
 public:	
 	// Called every frame
@@ -99,5 +96,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	void EquipWeaponImplementation(bool bEquipWeapon, const FWeaponStats& WeaponStats = FWeaponStats());
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastEquipWeapon(bool bEquipWeapon, const FWeaponStats& WeaponStats = FWeaponStats());
 
 };

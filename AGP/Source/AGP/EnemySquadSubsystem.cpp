@@ -80,6 +80,7 @@ TArray<AEnemyCharacter*> UEnemySquadSubsystem::GetSquadMembers(int SquadIndex)
 
 void UEnemySquadSubsystem::DisbandSquad(int SquadIndex)
 {
+	if(SquadIndex >= Squads.Num()) return;
 	for(AEnemyCharacter* Enemy : Squads[SquadIndex])
 	{
 		Enemy->OnSquadDisbanded();
@@ -90,6 +91,7 @@ void UEnemySquadSubsystem::DisbandSquad(int SquadIndex)
 
 void UEnemySquadSubsystem::RemoveSquadMember(int SquadIndex, AEnemyCharacter* SquadMember)
 {
+	UE_LOG(LogTemp, Display, TEXT("REMOVING SQUAD MEMBER"))
 	int RemovedIndex = Squads[SquadIndex].Find(SquadMember);
 	Squads[SquadIndex].RemoveAt(RemovedIndex);
 
